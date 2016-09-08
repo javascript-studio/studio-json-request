@@ -23,9 +23,9 @@ request({
 - `request(options[, data], callback)`: Creates a new HTTPS request, passing
   the `options` to Node [http.request][1], except for the `timeout` and
   `expect` properties.
-- `request_http(options[, data], callback)`: Like `request`, but creates an
+- `http_request(options[, data], callback)`: Like `request`, but creates an
   HTTP request instead of HTTPS.
-- `request_https(options[, data], callback)`: An alias for `request(...)`.
+- `https_request(options[, data], callback)`: An alias for `request(...)`.
 
 __Behavior:__
 
