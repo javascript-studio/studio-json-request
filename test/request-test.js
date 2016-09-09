@@ -20,6 +20,9 @@ describe('request', () => {
     req.abort = sinon.stub();
     res = {
       statusCode: 200,
+      headers: {
+        'content-type': 'application/json'
+      },
       setEncoding: () => {},
       on: sinon.stub()
     };
@@ -324,6 +327,20 @@ describe('request', () => {
     clock.tick(5000);
     sinon.assert.calledOnce(spy);
     sinon.assert.calledWith(spy, null, { some: 'payload' }, res);
+  });
+
+  it('does not fail if response is empty and not application/json', () => {
+    const spy = sinon.spy();
+    request({
+      hostname: 'that-host.com'
+    }, spy);
+    delete res.headers['content-type'];
+
+    https.request.yield(res);
+    res.on.withArgs('end').yield();
+
+    sinon.assert.calledOnce(spy);
+    sinon.assert.calledWith(spy, null, null, res);
   });
 
 });
