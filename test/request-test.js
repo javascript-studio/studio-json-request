@@ -343,4 +343,34 @@ describe('request', () => {
     sinon.assert.calledWith(spy, null, null, res);
   });
 
+  it('parses body if Content-Type is application/json; charset=utf-8', () => {
+    const spy = sinon.spy();
+    request({
+      hostname: 'that-host.com'
+    }, spy);
+    res.headers['content-type'] = 'application/json; charset=utf-8';
+
+    https.request.yield(res);
+    res.on.withArgs('data').yield(JSON.stringify({ some: 'payload' }));
+    res.on.withArgs('end').yield();
+
+    sinon.assert.calledOnce(spy);
+    sinon.assert.calledWith(spy, null, { some: 'payload' }, res);
+  });
+
+  it('does not throw if content-type is not provided', () => {
+    const spy = sinon.spy();
+    request({
+      hostname: 'that-host.com'
+    }, spy);
+    delete res.headers['content-type'];
+
+    https.request.yield(res);
+    res.on.withArgs('data').yield(JSON.stringify({ some: 'payload' }));
+    res.on.withArgs('end').yield();
+
+    sinon.assert.calledOnce(spy);
+    sinon.assert.calledWith(spy, null, null, res);
+  });
+
 });
