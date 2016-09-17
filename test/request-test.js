@@ -326,6 +326,39 @@ describe('request', () => {
     sinon.assert.calledWith(spy, null, { some: 'payload' }, res);
   });
 
+  it('does not fail if the response processing takes longer', () => {
+    const spy = sinon.spy();
+    request({
+      hostname: 'that-host.com',
+      timeout: 5000
+    }, spy);
+
+    https.request.yield(res);
+    res.on.withArgs('data').yield(JSON.stringify({ some: 'payload' }));
+    clock.tick(5000);
+    res.on.withArgs('end').yield();
+
+    sinon.assert.calledOnce(spy);
+    sinon.assert.calledWith(spy, null, { some: 'payload' }, res);
+  });
+
+  it('does not invoke the callback twice on timeout after unexpected response',
+    () => {
+      const spy = sinon.spy();
+      request({
+        hostname: 'that-host.com',
+        timeout: 5000,
+        expect: 200
+      }, spy);
+
+      res.statusCode = 300;
+      https.request.yield(res);
+      clock.tick(5000);
+
+      sinon.assert.calledOnce(spy);
+      sinon.assert.calledWith(spy, sinon.match.instanceOf(Error));
+    });
+
   it('does not fail if response is empty and not application/json', () => {
     const spy = sinon.spy();
     request({
