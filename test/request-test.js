@@ -24,7 +24,8 @@ describe('request', () => {
         'content-type': 'application/json'
       },
       setEncoding: () => {},
-      on: sinon.stub()
+      on: sinon.stub(),
+      resume: () => {}
     };
     sandbox = sinon.sandbox.create();
     sandbox.stub(http, 'request').returns(req);
@@ -121,7 +122,6 @@ describe('request', () => {
 
     res.statusCode = 199;
     https.request.yield(res);
-    res.on.withArgs('end').yield();
 
     sinon.assert.calledOnce(spy);
     sinon.assert.calledWith(spy, sinon.match.instanceOf(Error), null, res);
@@ -137,7 +137,6 @@ describe('request', () => {
 
     res.statusCode = 300;
     https.request.yield(res);
-    res.on.withArgs('end').yield();
 
     sinon.assert.calledOnce(spy);
     sinon.assert.calledWith(spy, sinon.match.instanceOf(Error), null, res);
@@ -165,7 +164,6 @@ describe('request', () => {
 
     res.statusCode = 201;
     https.request.yield(res);
-    res.on.withArgs('end').yield();
 
     sinon.assert.calledOnce(spy);
     sinon.assert.calledWith(spy, sinon.match.instanceOf(Error), null, res);
@@ -197,7 +195,6 @@ describe('request', () => {
 
       res.statusCode = 202;
       https.request.yield(res);
-      res.on.withArgs('end').yield();
 
       sinon.assert.calledOnce(spy);
       sinon.assert.calledWith(spy, sinon.match.instanceOf(Error), null, res);
