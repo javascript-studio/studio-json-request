@@ -21,20 +21,27 @@ request({
 ## API
 
 - `request(options[, data], callback)`: Creates a new HTTPS request, passing
-  the `options` to Node [http.request][1], except for the `timeout` and
-  `expect` properties.
+  the `options` to Node [http.request][1], except for these properties:
+    - `timeout` the number of milliseconds after which the request should time
+      out
+    - `expect` the expected status code(s)
+    - `stream` will cause the `callback` to be invoked with `(null, res)` once
+      the header was retrieved to allow to stream the response
 - `http_request(options[, data], callback)`: Like `request`, but creates an
   HTTP request instead of HTTPS.
 - `https_request(options[, data], callback)`: An alias for `request(...)`.
 
 __Behavior:__
 
-- If the `timeout` option is specified, a request timeout will be installed and
-  cause the request to be aborted and the callback to be invoked with an error.
+- If the `timeout` option is specified, a timer will be installed which will
+  abort the request and invoke the callback with an error.
 - If the `expect` option is specified, it validates the response HTTP status
   code. If it's a number the status code has to equal the number. If an array is
   given, any number in the array is accepted. If the option is not given, the
   request will fail for non `2xx` status codes.
+- If the `stream` option is specified, the response is returned immediately
+  after the status code was checked. No further response processing is done by
+  this library. It is the callers responsibility to consume the response.
 - If `data` is given, it will be stringified and passed as the request body,
   then and the request is sent. The `Content-Type` header will be set to
   `application/json`, unless this header was already provided and the

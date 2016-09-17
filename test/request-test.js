@@ -403,4 +403,35 @@ describe('request', () => {
     sinon.assert.calledWith(spy, null, null, res);
   });
 
+  it('returns the response instead of parsing it if `stream: true`', () => {
+    const spy = sinon.spy();
+    request({
+      hostname: 'that-host.com',
+      stream: true
+    }, spy);
+
+    https.request.yield(res);
+
+    sinon.assert.calledOnce(spy);
+    sinon.assert.calledWith(spy, null, res);
+    // Assert no data listeners are installed:
+    sinon.assert.notCalled(res.on.withArgs('data'));
+    sinon.assert.notCalled(res.on.withArgs('end'));
+  });
+
+  it('performs `expect` check if `stream: true`', () => {
+    const spy = sinon.spy();
+    request({
+      hostname: 'that-host.com',
+      stream: true,
+      expect: 200
+    }, spy);
+
+    res.statusCode = 300;
+    https.request.yield(res);
+
+    sinon.assert.calledOnce(spy);
+    sinon.assert.calledWith(spy, sinon.match.instanceOf(Error));
+  });
+
 });
