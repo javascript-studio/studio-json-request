@@ -8,6 +8,18 @@ const EventEmitter = require('events');
 const sinon = require('sinon');
 const { request } = require('..');
 
+function fake_response() {
+  return {
+    statusCode: 200,
+    headers: {
+      'content-type': 'application/json'
+    },
+    setEncoding: () => {},
+    on: sinon.stub(),
+    resume: () => {}
+  };
+}
+
 describe('request', () => {
   let req;
   let res;
@@ -18,15 +30,7 @@ describe('request', () => {
     req = new EventEmitter();
     req.end = sinon.stub();
     req.abort = sinon.stub();
-    res = {
-      statusCode: 200,
-      headers: {
-        'content-type': 'application/json'
-      },
-      setEncoding: () => {},
-      on: sinon.stub(),
-      resume: () => {}
-    };
+    res = fake_response();
     sandbox = sinon.sandbox.create();
     sandbox.stub(http, 'request').returns(req);
     sandbox.stub(https, 'request').returns(req);
@@ -432,6 +436,115 @@ describe('request', () => {
 
     sinon.assert.calledOnce(spy);
     sinon.assert.calledWith(spy, sinon.match.instanceOf(Error));
+  });
+
+  it('follows redirect if `stream: true`', () => {
+    request({
+      hostname: 'that-host.com',
+      expect: 302,
+      stream: true
+    }, () => {});
+
+    res.statusCode = 302;
+    delete res.headers['content-type'];
+    res.headers.location = 'https://other-host.com/some/path';
+    https.request.yield(res);
+
+    sinon.assert.calledTwice(https.request);
+    sinon.assert.calledWithMatch(https.request, {
+      hostname: 'other-host.com',
+      path: '/some/path'
+    });
+  });
+
+  it('follows redirect if no stream', () => {
+    const spy = sinon.spy();
+    request({
+      hostname: 'that-host.com',
+      expect: [200, 302]
+    }, spy);
+
+    res.statusCode = 302;
+    delete res.headers['content-type'];
+    res.headers.location = 'https://other-host.com/some/path';
+    https.request.firstCall.yield(res);
+
+    res = fake_response();
+    https.request.secondCall.yield(res);
+    res.on.withArgs('data').yield(JSON.stringify({ some: 'payload' }));
+    res.on.withArgs('end').yield();
+
+    sinon.assert.calledTwice(https.request);
+    sinon.assert.calledWithMatch(https.request, {
+      hostname: 'other-host.com',
+      path: '/some/path'
+    });
+    sinon.assert.calledOnce(spy);
+    sinon.assert.calledWith(spy, null, { some: 'payload' });
+  });
+
+  it('retains host and port if redirect location is only a path', () => {
+    request({
+      hostname: 'that-host.com',
+      port: 8080,
+      expect: 302,
+      stream: true
+    }, () => {});
+
+    res.statusCode = 302;
+    delete res.headers['content-type'];
+    res.headers.location = '/some/path';
+    https.request.yield(res);
+
+    sinon.assert.calledTwice(https.request);
+    sinon.assert.calledWithMatch(https.request.secondCall, {
+      hostname: 'that-host.com',
+      port: 8080,
+      path: '/some/path'
+    });
+  });
+
+  it('does not follow another redirect', () => {
+    const spy = sinon.spy();
+    request({
+      hostname: 'that-host.com',
+      expect: [200, 302],
+      stream: true
+    }, spy);
+
+    res.statusCode = 302;
+    delete res.headers['content-type'];
+    res.headers.location = '/some/path';
+    https.request.firstCall.yield(res);
+    https.request.secondCall.yield(res);
+
+    sinon.assert.calledOnce(spy);
+    sinon.assert.calledWithMatch(spy, {
+      message: 'Expected response statusCode to be 200, but was 302',
+      code: 'E_EXPECT'
+    });
+  });
+
+  it('retains expect array when following redirects', () => {
+    const spy = sinon.spy();
+    request({
+      hostname: 'that-host.com',
+      expect: [200, 201, 302],
+      stream: true
+    }, spy);
+
+    res.statusCode = 302;
+    delete res.headers['content-type'];
+    res.headers.location = '/some/path';
+    https.request.firstCall.yield(res);
+    https.request.secondCall.yield(res);
+
+    sinon.assert.calledOnce(spy);
+    sinon.assert.calledWithMatch(spy, {
+      message:
+        'Expected response statusCode to be one of [200, 201], but was 302',
+      code: 'E_EXPECT'
+    });
   });
 
 });

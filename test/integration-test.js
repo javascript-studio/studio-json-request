@@ -34,4 +34,34 @@ describe('integration', () => {
     });
   });
 
+  it('request redirect', (done) => {
+    server = http.createServer((req, res) => {
+      if (req.url === '/') {
+        res.statusCode = 302;
+        res.setHeader('location', '/some-path');
+      } else if (req.url === '/some-path') {
+        res.statusCode = 200;
+        res.setHeader('content-type', 'application/json');
+        res.write(JSON.stringify({ hello: 'redirect' }));
+      } else {
+        res.statusCode = 500;
+      }
+      res.end();
+    });
+    server.listen(() => {
+
+      http_request({
+        port: server.address().port,
+        path: '/',
+        expect: [200, 302]
+      }, (err, json, res) => {
+        assert.ifError(err);
+        assert.equal(res.statusCode, 200);
+        assert.deepEqual(json, { hello: 'redirect' });
+        done();
+      });
+
+    });
+  });
+
 });
