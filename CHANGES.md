@@ -1,5 +1,11 @@
 # Changes
 
+## 1.2.0
+
+Follow redirects if the `expect` array contains `302` and a `location` header
+is in the response. A second redirect will not be followed and result in an
+`E_EXPECT` error.
+
 ## 1.1.0
 
 - Add `stream` option to yield the raw response
