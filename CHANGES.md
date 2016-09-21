@@ -1,5 +1,9 @@
 # Changes
 
+## 1.2.1
+
+- Add `console` logs until we have a real logger
+
 ## 1.2.0
 
 Follow redirects if the `expect` array contains `302` and a `location` header
