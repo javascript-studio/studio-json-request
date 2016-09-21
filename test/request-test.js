@@ -34,6 +34,7 @@ describe('request', () => {
     sandbox = sinon.sandbox.create();
     sandbox.stub(http, 'request').returns(req);
     sandbox.stub(https, 'request').returns(req);
+    sandbox.stub(console, 'info');
     clock = sandbox.useFakeTimers();
   });
 
@@ -420,7 +421,6 @@ describe('request', () => {
     sinon.assert.calledWith(spy, null, res);
     // Assert no data listeners are installed:
     sinon.assert.notCalled(res.on.withArgs('data'));
-    sinon.assert.notCalled(res.on.withArgs('end'));
   });
 
   it('performs `expect` check if `stream: true`', () => {
