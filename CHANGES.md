@@ -1,5 +1,10 @@
 # Changes
 
+## 1.2.3
+
+- Print text response for unexpected response
+- Missing colon in logs if protocol is `http`
+
 ## 1.2.2
 
 - Log request / response header and body in error cases
