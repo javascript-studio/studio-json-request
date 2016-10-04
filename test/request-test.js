@@ -547,4 +547,28 @@ describe('request', () => {
     });
   });
 
+  function assert_log_body(content_type, body) {
+    const spy = sinon.spy();
+    request({
+      hostname: 'that-host.com'
+    }, spy);
+
+    res.statusCode = 403;
+    res.headers['content-type'] = content_type;
+    https.request.firstCall.yield(res);
+    res.on.withArgs('data').yield(body);
+    res.on.withArgs('end').yield();
+
+    sinon.assert.calledWith(console.info, `   Body: ${body}`);
+    sinon.assert.calledOnce(spy);
+  }
+
+  it('logs body if content type is text/plain', () => {
+    assert_log_body('text/plain', 'You suck!');
+  });
+
+  it('logs body if content type is text/html', () => {
+    assert_log_body('text/plain', '<html>You suck!</html>');
+  });
+
 });
