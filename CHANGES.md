@@ -1,5 +1,9 @@
 # Changes
 
+## 1.2.2
+
+- Log request / response header and body in error cases
+
 ## 1.2.1
 
 - Add `console` logs until we have a real logger
