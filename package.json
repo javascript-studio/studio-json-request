@@ -1,6 +1,6 @@
 {
   "name": "@studio/json-request",
-  "version": "1.2.3",
+  "version": "1.3.0",
   "description": "JavaScript Studio JSON Request",
   "main": "lib/request.js",
   "engines": {

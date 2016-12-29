@@ -1,5 +1,9 @@
 # Changes
 
+## 1.3.0
+
+- Support sending streams
+
 ## 1.2.3
 
 - Print text response for unexpected response
