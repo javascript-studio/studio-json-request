@@ -92,6 +92,26 @@ describe('request', () => {
     sinon.assert.calledWith(req.end, JSON.stringify(payload));
   });
 
+  it('sends the request with stream payload', () => {
+    const stream = { pipe: sinon.stub() };
+
+    request({
+      method: 'POST',
+      hostname: 'that-host.com',
+      path: '/'
+    }, stream, () => {});
+
+    sinon.assert.calledOnce(https.request);
+    sinon.assert.calledWith(https.request, {
+      method: 'POST',
+      hostname: 'that-host.com',
+      path: '/'
+    });
+    sinon.assert.notCalled(req.end);
+    sinon.assert.calledOnce(stream.pipe);
+    sinon.assert.calledWith(stream.pipe, req);
+  });
+
   it('sends the request without payload or additional headers', () => {
     request({
       hostname: 'that-host.com',

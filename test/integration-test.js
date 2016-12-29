@@ -21,7 +21,7 @@ describe('integration', () => {
   });
 
   it('request timeout', (done) => {
-    server = http.createServer((req, _res) => {});
+    server = http.createServer((_req, _res) => {});
     server.listen(() => {
 
       const on_abort = sinon.spy();
