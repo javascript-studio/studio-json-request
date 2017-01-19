@@ -1,5 +1,9 @@
 # Changes
 
+## 1.3.1
+
+- Always log body on unexpected response
+
 ## 1.3.0
 
 - Support sending streams
