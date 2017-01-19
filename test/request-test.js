@@ -15,8 +15,7 @@ function fake_response() {
       'content-type': 'application/json'
     },
     setEncoding: () => {},
-    on: sinon.stub(),
-    resume: () => {}
+    on: sinon.stub()
   };
 }
 
@@ -147,6 +146,7 @@ describe('request', () => {
 
     res.statusCode = 199;
     https.request.yield(res);
+    res.on.withArgs('end').yield();
 
     sinon.assert.calledOnce(spy);
     sinon.assert.calledWith(spy, sinon.match.instanceOf(Error), null, res);
@@ -162,6 +162,7 @@ describe('request', () => {
 
     res.statusCode = 300;
     https.request.yield(res);
+    res.on.withArgs('end').yield();
 
     sinon.assert.calledOnce(spy);
     sinon.assert.calledWith(spy, sinon.match.instanceOf(Error), null, res);
@@ -189,6 +190,7 @@ describe('request', () => {
 
     res.statusCode = 201;
     https.request.yield(res);
+    res.on.withArgs('end').yield();
 
     sinon.assert.calledOnce(spy);
     sinon.assert.calledWith(spy, sinon.match.instanceOf(Error), null, res);
@@ -220,6 +222,7 @@ describe('request', () => {
 
       res.statusCode = 202;
       https.request.yield(res);
+      res.on.withArgs('end').yield();
 
       sinon.assert.calledOnce(spy);
       sinon.assert.calledWith(spy, sinon.match.instanceOf(Error), null, res);
@@ -378,6 +381,7 @@ describe('request', () => {
 
       res.statusCode = 300;
       https.request.yield(res);
+      res.on.withArgs('end').yield();
       clock.tick(5000);
 
       sinon.assert.calledOnce(spy);
@@ -453,6 +457,7 @@ describe('request', () => {
 
     res.statusCode = 300;
     https.request.yield(res);
+    res.on.withArgs('end').yield();
 
     sinon.assert.calledOnce(spy);
     sinon.assert.calledWith(spy, sinon.match.instanceOf(Error));
@@ -535,6 +540,7 @@ describe('request', () => {
     res.statusCode = 302;
     delete res.headers['content-type'];
     res.headers.location = '/some/path';
+    res.on.withArgs('end').yields();
     https.request.firstCall.yield(res);
     https.request.secondCall.yield(res);
 
@@ -556,6 +562,7 @@ describe('request', () => {
     res.statusCode = 302;
     delete res.headers['content-type'];
     res.headers.location = '/some/path';
+    res.on.withArgs('end').yields();
     https.request.firstCall.yield(res);
     https.request.secondCall.yield(res);
 
