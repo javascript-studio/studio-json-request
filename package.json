@@ -19,6 +19,9 @@
   "eslintConfig": {
     "extends": "@studio"
   },
+  "dependencies": {
+    "@studio/log": "^1.0.0"
+  },
   "devDependencies": {
     "@studio/changes": "^1.0.2",
     "@studio/eslint-config": "^1.0.0",

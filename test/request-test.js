@@ -6,6 +6,7 @@ const http = require('http');
 const https = require('https');
 const EventEmitter = require('events');
 const sinon = require('sinon');
+const logger = require('@studio/log');
 const { request } = require('..');
 
 function fake_response() {
@@ -24,6 +25,14 @@ describe('request', () => {
   let res;
   let sandbox;
   let clock;
+
+  before(() => {
+    logger.mute('json-request');
+  });
+
+  after(() => {
+    logger.reset();
+  });
 
   beforeEach(() => {
     req = new EventEmitter();
@@ -575,6 +584,9 @@ describe('request', () => {
   });
 
   function assert_log_body(content_type, body) {
+    const log = logger('json-request');
+    sandbox.stub(log, 'warn');
+
     const spy = sinon.spy();
     request({
       hostname: 'that-host.com'
@@ -586,7 +598,20 @@ describe('request', () => {
     res.on.withArgs('data').yield(body);
     res.on.withArgs('end').yield();
 
-    sinon.assert.calledWith(console.info, `   Body: ${body}`);
+    sinon.assert.calledOnce(log.warn);
+    sinon.assert.calledWithMatch(log.warn, {
+      request: {
+        protocol: 'https',
+        method: 'GET',
+        host: 'that-host.com',
+        path: '/'
+      },
+      response: {
+        statusCode: 403,
+        headers: { 'content-type': content_type },
+        body
+      }
+    });
     sinon.assert.calledOnce(spy);
   }
 
