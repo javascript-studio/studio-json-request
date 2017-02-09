@@ -1,5 +1,10 @@
 # Changes
 
+## 1.4.0
+
+- Use [@studio/log](https://github.com/javascript-studio/studio-log)
+- Include body in error log if parse failed
+
 ## 1.3.1
 
 - Always log body on unexpected response
