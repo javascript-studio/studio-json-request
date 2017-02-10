@@ -1,5 +1,9 @@
 # Changes
 
+## 1.4.1
+
+🐛 Fix `log.finished` -> `log.finish`
+
 ## 1.4.0
 
 - Use [@studio/log](https://github.com/javascript-studio/studio-log)
