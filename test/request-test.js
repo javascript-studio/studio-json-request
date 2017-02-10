@@ -26,14 +26,6 @@ describe('request', () => {
   let sandbox;
   let clock;
 
-  before(() => {
-    logger.mute('json-request');
-  });
-
-  after(() => {
-    logger.reset();
-  });
-
   beforeEach(() => {
     req = new EventEmitter();
     req.end = sinon.stub();

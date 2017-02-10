@@ -4,21 +4,12 @@
 const assert = require('assert');
 const sinon = require('sinon');
 const http = require('http');
-const logger = require('@studio/log');
 const { http_request } = require('..');
 
 
 describe('integration', () => {
   let server;
   let sandbox;
-
-  before(() => {
-    logger.mute('json-request');
-  });
-
-  after(() => {
-    logger.reset();
-  });
 
   beforeEach(() => {
     sandbox = sinon.sandbox.create();
