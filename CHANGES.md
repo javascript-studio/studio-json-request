@@ -1,5 +1,9 @@
 # Changes
 
+## 1.4.2
+
+🙈 Support Node 4
+
 ## 1.4.1
 
 🐛 Fix `log.finished` -> `log.finish`
