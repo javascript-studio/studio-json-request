@@ -4,7 +4,7 @@
 const assert = require('assert');
 const sinon = require('sinon');
 const http = require('http');
-const { http_request } = require('..');
+const http_request = require('..').http_request;
 
 
 describe('integration', () => {

@@ -7,7 +7,7 @@ const https = require('https');
 const EventEmitter = require('events');
 const sinon = require('sinon');
 const logger = require('@studio/log');
-const { request } = require('..');
+const request = require('..').request;
 
 function fake_response() {
   return {
@@ -259,7 +259,7 @@ describe('request', () => {
     sinon.assert.calledWith(spy, sinon.match.instanceOf(Error), '<html/>', res);
     sinon.assert.calledWithMatch(spy, {
       name: 'SyntaxError',
-      message: 'Unexpected token < in JSON at position 0',
+      message: sinon.match('Unexpected token <'),
       code: 'E_JSON'
     });
   });
