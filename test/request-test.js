@@ -34,7 +34,6 @@ describe('request', () => {
     sandbox = sinon.sandbox.create();
     sandbox.stub(http, 'request').returns(req);
     sandbox.stub(https, 'request').returns(req);
-    sandbox.stub(console, 'info');
     clock = sandbox.useFakeTimers();
   });
 

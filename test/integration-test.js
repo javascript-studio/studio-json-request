@@ -9,15 +9,8 @@ const request = require('..');
 
 describe('integration', () => {
   let server;
-  let sandbox;
-
-  beforeEach(() => {
-    sandbox = sinon.sandbox.create();
-    sandbox.stub(console, 'info');
-  });
 
   afterEach(() => {
-    sandbox.restore();
     server.close();
   });
 
