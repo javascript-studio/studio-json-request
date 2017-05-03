@@ -9,7 +9,7 @@ const sinon = require('sinon');
 const logger = require('@studio/log');
 const request = require('..');
 
-function fake_response() {
+function fakeResponse() {
   return {
     statusCode: 200,
     headers: {
@@ -30,7 +30,7 @@ describe('request', () => {
     req = new EventEmitter();
     req.end = sinon.stub();
     req.abort = sinon.stub();
-    res = fake_response();
+    res = fakeResponse();
     sandbox = sinon.sandbox.create();
     sandbox.stub(http, 'request').returns(req);
     sandbox.stub(https, 'request').returns(req);
@@ -538,7 +538,7 @@ describe('request', () => {
     res.headers.location = 'https://other-host.com/some/path';
     https.request.firstCall.yield(res);
 
-    res = fake_response();
+    res = fakeResponse();
     https.request.secondCall.yield(res);
     res.on.withArgs('data').yield(JSON.stringify({ some: 'payload' }));
     res.on.withArgs('end').yield();
