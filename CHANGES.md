@@ -1,5 +1,12 @@
 # Changes
 
+## 2.0.0
+
+- ✨ Breaking: Reduce API to single function
+
+  Removed `http_request` and `https_request` and instead support an additional
+  `protocol` option.
+
 ## 1.4.2
 
 - 🙈 Support Node 4
