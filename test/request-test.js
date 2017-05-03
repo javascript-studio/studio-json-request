@@ -7,7 +7,7 @@ const https = require('https');
 const EventEmitter = require('events');
 const sinon = require('sinon');
 const logger = require('@studio/log');
-const request = require('..').request;
+const request = require('..');
 
 function fake_response() {
   return {
@@ -55,6 +55,49 @@ describe('request', () => {
       hostname: 'that-host.com',
       path: '/'
     });
+  });
+
+  it('passes given options to `http.request` if protocol is "http"', () => {
+    request({
+      protocol: 'http:',
+      method: 'POST',
+      hostname: 'that-host.com',
+      path: '/'
+    }, () => {});
+
+    sinon.assert.calledOnce(http.request);
+    sinon.assert.calledWith(http.request, {
+      method: 'POST',
+      hostname: 'that-host.com',
+      path: '/'
+    });
+  });
+
+  it('passes given options to `https.request` if protocol is "https"', () => {
+    request({
+      protocol: 'https:',
+      method: 'POST',
+      hostname: 'that-host.com',
+      path: '/'
+    }, () => {});
+
+    sinon.assert.calledOnce(https.request);
+    sinon.assert.calledWith(https.request, {
+      method: 'POST',
+      hostname: 'that-host.com',
+      path: '/'
+    });
+  });
+
+  it('throws on invalid protocol', () => {
+    assert.throws(() => {
+      request({
+        protocol: 'ftp:',
+        method: 'GET',
+        hostname: 'that-host.com',
+        path: '/'
+      }, () => {});
+    }, /^Error: Unsupported protocol "ftp:"$/);
   });
 
   it('yields parsed response body', () => {
@@ -525,7 +568,7 @@ describe('request', () => {
     sinon.assert.calledTwice(https.request);
     sinon.assert.calledWithMatch(https.request.secondCall, {
       hostname: 'that-host.com',
-      port: 8080,
+      port: '8080',
       path: '/some/path'
     });
   });

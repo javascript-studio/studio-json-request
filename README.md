@@ -1,12 +1,12 @@
 # JavaScript Studio JSON Request
 
-A tiny, dependency free Node HTTP and HTTPS request wrapper, for JSON requests
-and responses, with timeout support and status code validation.
+A tiny Node HTTP and HTTPS request wrapper, for JSON requests and responses,
+with timeout support and status code validation.
 
 ## Usage
 
 ```js
-const { request } = require('@studio/request');
+const request = require('@studio/request');
 
 request({
   method: 'POST',
@@ -22,14 +22,13 @@ request({
 
 - `request(options[, data], callback)`: Creates a new HTTPS request, passing
   the `options` to Node [http.request][1], except for these properties:
+    - `protocol`: the protocol to use. Must be either `"http:"` or `"https:"`.
+      Defaults to `"https:"`.
     - `timeout` the number of milliseconds after which the request should time
       out
     - `expect` the expected status code(s)
     - `stream` will cause the `callback` to be invoked with `(null, res)` once
       the header was retrieved to allow to stream the response
-- `http_request(options[, data], callback)`: Like `request`, but creates an
-  HTTP request instead of HTTPS.
-- `https_request(options[, data], callback)`: An alias for `request(...)`.
 
 __Behavior:__
 

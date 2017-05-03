@@ -4,7 +4,7 @@
 const assert = require('assert');
 const sinon = require('sinon');
 const http = require('http');
-const http_request = require('..').http_request;
+const request = require('..');
 
 
 describe('integration', () => {
@@ -26,7 +26,8 @@ describe('integration', () => {
     server.listen(() => {
 
       const on_abort = sinon.spy();
-      const req = http_request({
+      const req = request({
+        protocol: 'http:',
         port: server.address().port,
         timeout: 10
       }, (err) => {
@@ -58,7 +59,8 @@ describe('integration', () => {
     });
     server.listen(() => {
 
-      http_request({
+      request({
+        protocol: 'http:',
         port: server.address().port,
         path: '/',
         expect: [200, 302]
