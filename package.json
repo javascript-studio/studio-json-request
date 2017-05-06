@@ -1,7 +1,7 @@
 {
   "name": "@studio/json-request",
   "version": "2.0.0",
-  "description": "JavaScript Studio JSON Request",
+  "description": "A tiny Node HTTP(S) request wrapper, for JSON requests and responses",
   "main": "lib/request.js",
   "engines": {
     "node": ">=4.0.0"
@@ -15,7 +15,16 @@
     "version": "changes",
     "postversion": "git push --follow-tags && npm publish"
   },
-  "author": "Maximilian Antoni <mail@maxantoni.de> (http://maxantoni.de/)",
+  "keywords": [
+    "http",
+    "https",
+    "json",
+    "request",
+    "timeout",
+    "validation"
+  ],
+  "author": "Maximilian Antoni <max@javascript.studio>",
+  "homepage": "https://github.com/javascript-studio/studio-json-request",
   "eslintConfig": {
     "extends": "@studio"
   },
