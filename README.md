@@ -1,7 +1,7 @@
-# JavaScript Studio JSON Request
+# HTTP(S) JSON Request Wrapper for Node
 
-A tiny Node HTTP and HTTPS request wrapper, for JSON requests and responses,
-with timeout support and status code validation.
+A tiny Node HTTP(S) request wrapper, for JSON requests and responses, with
+timeout support and status code validation.
 
 ## Usage
 
@@ -30,7 +30,7 @@ request({
     - `stream` will cause the `callback` to be invoked with `(null, res)` once
       the header was retrieved to allow to stream the response
 
-__Behavior:__
+### Behavior
 
 - If the `timeout` option is specified, a timer will be installed which will
   abort the request and invoke the callback with an error.
@@ -49,7 +49,7 @@ __Behavior:__
 - If `data` is omitted, the request object is returned and it's the callers
   responsibility to invoke `req.end()`.
 
-__Callback:__
+### Callback
 
 The callback is invoked with `(err, data, response)`.
 
