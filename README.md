@@ -63,4 +63,10 @@ The callback is invoked with `(err, data, response)`.
 - `data`: The parsed response data, or if it could not be parsed the raw body.
 - `response`: The response object.
 
+## License
+
+MIT
+
+<div align="center">Made with ❤️ on 🌍</div>
+
 [1]: https://nodejs.org/dist/latest-v6.x/docs/api/http.html#http_http_request_options_callback
