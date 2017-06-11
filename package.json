@@ -38,5 +38,9 @@
     "mocha": "^2.3.3",
     "sinon": "^1.17.2"
   },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/javascript-studio/studio-json-request.git"
+  },
   "license": "MIT"
 }
