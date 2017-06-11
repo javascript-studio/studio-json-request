@@ -1,5 +1,12 @@
 # Changes
 
+## 2.0.1
+
+- 📚 Add related modules section
+- ✨ Add keywords, description, homepage and repository
+- ✨ Add MIT license
+- ✨ Add `package-lock.json`
+
 ## 2.0.0
 
 - ✨ Breaking: Reduce API to single function
