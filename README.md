@@ -1,6 +1,6 @@
-# HTTP(S) JSON Request Wrapper for Node
+# Studio JSON Request
 
-A tiny Node HTTP(S) request wrapper, for JSON requests and responses, with
+📡 A tiny Node HTTP(S) request wrapper, for JSON requests and responses, with
 timeout support and status code validation.
 
 ## Usage
@@ -63,6 +63,13 @@ The callback is invoked with `(err, data, response)`.
 - `data`: The parsed response data, or if it could not be parsed the raw body.
 - `response`: The response object.
 
+## Related modules
+
+- 🎮 [Studio CLI][2] this module was initially developed for the [JavaScript
+  Studio][3] command line tool.
+- ☯️ [Studio Log][4] is used for logging.
+- 📦 [Studio Changes][5] is used to create the changelog for this module.
+
 ## License
 
 MIT
@@ -70,3 +77,7 @@ MIT
 <div align="center">Made with ❤️ on 🌍</div>
 
 [1]: https://nodejs.org/dist/latest-v6.x/docs/api/http.html#http_http_request_options_callback
+[2]: https://github.com/javascript-studio/studio-cli
+[3]: https://javascript.studio
+[4]: https://github.com/javascript-studio/studio-log
+[5]: https://github.com/javascript-studio/studio-changes
