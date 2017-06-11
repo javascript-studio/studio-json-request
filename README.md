@@ -67,7 +67,7 @@ The callback is invoked with `(err, data, response)`.
 
 - 🎮 [Studio CLI][2] this module was initially developed for the [JavaScript
   Studio][3] command line tool.
-- ☯️ [Studio Log][4] is used for logging.
+- 👻 [Studio Log][4] is used for logging.
 - 📦 [Studio Changes][5] is used to create the changelog for this module.
 
 ## License
