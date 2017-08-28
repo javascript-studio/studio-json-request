@@ -6,7 +6,7 @@ timeout support and status code validation.
 ## Usage
 
 ```js
-const request = require('@studio/request');
+const request = require('@studio/json-request');
 
 request({
   method: 'POST',
