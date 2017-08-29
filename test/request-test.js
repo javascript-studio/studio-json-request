@@ -617,7 +617,7 @@ describe('request', () => {
     });
   });
 
-  function assert_log_body(content_type, body) {
+  function assertLogBody(content_type, body) {
     const log = logger('json-request');
     sandbox.stub(log, 'warn');
 
@@ -650,11 +650,11 @@ describe('request', () => {
   }
 
   it('logs body if content type is text/plain', () => {
-    assert_log_body('text/plain', 'You suck!');
+    assertLogBody('text/plain', 'You suck!');
   });
 
   it('logs body if content type is text/html', () => {
-    assert_log_body('text/plain', '<html>You suck!</html>');
+    assertLogBody('text/plain', '<html>You suck!</html>');
   });
 
 });
