@@ -1,5 +1,9 @@
 # Changes
 
+## 2.0.3
+
+- ✨ Log parsed JSON response body
+
 ## 2.0.2
 
 - 📚 Improve documentation
