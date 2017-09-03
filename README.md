@@ -57,7 +57,9 @@ The callback is invoked with `(err, data, response)`.
 - `err`: An error object or `null`. The error will have a `code` property with
   these possible string values:
     - `E_TIMEOUT`: The request timed out.
-    - `E_EXPECT`: The response status code does not match the expectation.
+    - `E_EXPECT`: The response status code does not match the expectation. The
+      `statusCode` property on the error object is set to the response status
+      code.
     - `E_JSON`: Could not parse the response body as JSON. In this case `data`
       is the raw body.
     - `E_ERROR`: If an `error` event was thrown.

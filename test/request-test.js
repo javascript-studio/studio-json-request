@@ -197,6 +197,7 @@ describe('request', () => {
       message: 'Expected response statusCode to be 2xx, but was 199',
       code: 'E_EXPECT'
     });
+    assert.equal(spy.firstCall.args[0].statusCode, 199);
   });
 
   it('fails the request if `statusCode` is > 299', () => {
@@ -213,6 +214,7 @@ describe('request', () => {
       message: 'Expected response statusCode to be 2xx, but was 300',
       code: 'E_EXPECT'
     });
+    assert.equal(spy.firstCall.args[0].statusCode, 300);
   });
 
   it('does not fail the request if `statusCode` is 201', () => {
@@ -244,6 +246,7 @@ describe('request', () => {
     sinon.assert.neverCalledWithMatch(https.request, {
       expect: 200
     });
+    assert.equal(spy.firstCall.args[0].statusCode, 201);
   });
 
   it('does not fail request if `statusCode` equals `expect`', () => {
@@ -274,6 +277,7 @@ describe('request', () => {
           + 'but was 202',
         code: 'E_EXPECT'
       });
+      assert.equal(spy.firstCall.args[0].statusCode, 202);
     });
 
   it('does not fail request if `statusCode` is in `expect` array', () => {
