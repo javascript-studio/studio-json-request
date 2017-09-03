@@ -1,5 +1,9 @@
 # Changes
 
+## 2.1.0
+
+- 🍏 Expose response status code on `E_EXPECT` error
+
 ## 2.0.3
 
 - ✨ Log parsed JSON response body
