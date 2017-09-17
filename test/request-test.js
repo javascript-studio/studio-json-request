@@ -4,6 +4,7 @@
 const assert = require('assert');
 const http = require('http');
 const https = require('https');
+const stream = require('stream');
 const EventEmitter = require('events');
 const sinon = require('sinon');
 const logger = require('@studio/log');
@@ -370,18 +371,20 @@ describe('request', () => {
 
   it('clears the timeout on error', () => {
     const spy = sinon.spy();
+    const error = new Error('ouch!');
 
     request({
       hostname: 'that-host.com',
       timeout: 5000
     }, spy);
 
-    req.emit('error', new Error('ouch!'));
+    req.emit('error', error);
     clock.tick(5000);
     sinon.assert.calledOnce(spy);
     sinon.assert.calledWithMatch(spy, {
-      message: 'ouch!',
-      code: 'E_ERROR'
+      message: 'Request failure',
+      code: 'E_ERROR',
+      cause: error
     });
   });
 
@@ -659,6 +662,80 @@ describe('request', () => {
 
   it('logs body if content type is text/html', () => {
     assertLogBody('text/plain', '<html>You suck!</html>');
+  });
+
+  it('logs JSON request headers on request error event', () => {
+    const log = logger('json-request');
+    sandbox.stub(log, 'error');
+    const spy = sinon.spy();
+    request({
+      hostname: 'that-host.com',
+      headers: { some: 'header' }
+    }, spy);
+    clock.tick(17);
+
+    req.emit('error', new Error('ECONREFUSED'));
+
+    sinon.assert.calledWith(log.error, {
+      ms: 17,
+      request: {
+        protocol: 'https',
+        method: 'GET',
+        host: 'that-host.com',
+        path: '/',
+        headers: { some: 'header' }
+      }
+    });
+    sinon.assert.calledOnce(spy);
+  });
+
+  it('logs JSON request body on request error event', () => {
+    const log = logger('json-request');
+    sandbox.stub(log, 'error');
+    const spy = sinon.spy();
+    request({
+      hostname: 'that-host.com',
+    }, { is: 42 }, spy);
+    clock.tick(17);
+
+    req.emit('error', new Error('ECONREFUSED'));
+
+    sinon.assert.calledWith(log.error, {
+      ms: 17,
+      request: {
+        protocol: 'https',
+        method: 'GET',
+        host: 'that-host.com',
+        path: '/',
+        headers: { 'Content-Length': 9, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ is: 42 })
+      }
+    });
+    sinon.assert.calledOnce(spy);
+  });
+
+  it('does not log stream request body on request error event', () => {
+    const log = logger('json-request');
+    sandbox.stub(log, 'error');
+    const spy = sinon.spy();
+    request({
+      hostname: 'that-host.com',
+    }, new stream.PassThrough(), spy);
+    clock.tick(17);
+
+    req.emit('error', new Error('ECONREFUSED'));
+
+    sinon.assert.calledWith(log.error, {
+      ms: 17,
+      request: {
+        protocol: 'https',
+        method: 'GET',
+        host: 'that-host.com',
+        path: '/',
+        headers: undefined
+      }
+    });
+    sinon.assert.calledOnce(spy);
   });
 
 });

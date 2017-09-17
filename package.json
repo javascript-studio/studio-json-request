@@ -29,7 +29,7 @@
     "extends": "@studio"
   },
   "dependencies": {
-    "@studio/log": "^1.0.4"
+    "@studio/log": "^1.5.0"
   },
   "devDependencies": {
     "@studio/changes": "^1.0.2",
