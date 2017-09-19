@@ -1,5 +1,9 @@
 # Changes
 
+## 2.1.1
+
+- ✨ Improve error handing and logging
+
 ## 2.1.0
 
 - 🍏 Expose response status code on `E_EXPECT` error
