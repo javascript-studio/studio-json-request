@@ -1,7 +1,13 @@
 # Studio JSON Request
 
-📡 A tiny Node HTTP(S) request wrapper, for JSON requests and responses, with
-timeout support and status code validation.
+📡 A tiny Node HTTP(S) request wrapper for JSON APIs.
+
+- Transparent JSON request / response handling
+- Timeout support
+- Status code validation and default validation for 2xx responses
+- Follows redirects, but only once
+- Unified error handling with status codes
+- Consistent logging with [Studio Log][4]
 
 ## Usage
 
