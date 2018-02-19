@@ -625,7 +625,7 @@ describe('request', () => {
   });
 
   function assertLogBody(content_type, body) {
-    const log = logger('json-request');
+    const log = logger('Request');
     sandbox.stub(log, 'warn');
 
     const spy = sinon.spy();
@@ -665,7 +665,7 @@ describe('request', () => {
   });
 
   it('logs JSON request headers on request error event', () => {
-    const log = logger('json-request');
+    const log = logger('Request');
     sandbox.stub(log, 'error');
     const spy = sinon.spy();
     request({
@@ -690,7 +690,7 @@ describe('request', () => {
   });
 
   it('logs JSON request body on request error event', () => {
-    const log = logger('json-request');
+    const log = logger('Request');
     sandbox.stub(log, 'error');
     const spy = sinon.spy();
     request({
@@ -715,7 +715,7 @@ describe('request', () => {
   });
 
   it('does not log stream request body on request error event', () => {
-    const log = logger('json-request');
+    const log = logger('Request');
     sandbox.stub(log, 'error');
     const spy = sinon.spy();
     request({
@@ -736,6 +736,20 @@ describe('request', () => {
       }
     });
     sinon.assert.calledOnce(spy);
+  });
+
+  it('uses a child logger of the given logger', () => {
+    const log = logger('custom');
+    const child_log = log.child('Request');
+    sandbox.stub(child_log, 'error');
+    request({
+      log,
+      hostname: 'that-host.com'
+    }, () => {});
+
+    req.emit('error', new Error('ECONREFUSED'));
+
+    sinon.assert.calledOnce(child_log.error);
   });
 
 });

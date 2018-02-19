@@ -30,6 +30,7 @@ request({
       of numbers.
     - `stream`: If `true`, the `callback` is invoked with `(null, res)` once
       the header was retrieved to allow to stream the response.
+    - `log`: A [parent logger][4] to use for the "Request" logger.
 
 ### Behavior
 
@@ -66,12 +67,38 @@ The callback is invoked with `(err, data, response)`.
 - `data`: The parsed response data, or if it could not be parsed the raw body.
 - `response`: The response object.
 
+### Logging
+
+Every request produces a log entry when the response was processed with this
+data:
+
+- `request`:
+    - `protocol`: The protocol used
+    - `method`: The request method used
+    - `host`: The host name
+    - `path`: The path
+    - `headers`: The request headers, if any
+    - `port`: The port, if specified
+    - `body`: The request body, if given
+- `response`:
+    - `statusCode`: The response status code
+    - `headers`: The response headers
+    - `body`: The response body, if available
+- `ms_head`: The time it took to receive the response header
+- `ms_body`: The time it took to receive the response body
+
+If `stream` was set, the log entry is produced once the response header was
+received without the `response` and `ms_body` properties, and another log entry
+is produced when the response body was received with `ms_body`.
+
 ## Related modules
 
 - 🎮 [Studio CLI][2] this module was initially developed for the [JavaScript
   Studio][3] command line tool.
 - 👻 [Studio Log][4] is used for logging.
-- 📦 [Studio Changes][5] is used to create the changelog for this module.
+- ❎ [Studio Log X][5] can be use to X-out confidential information from the
+  logs.
+- 📦 [Studio Changes][6] is used to create the changelog for this module.
 
 ## License
 
@@ -83,4 +110,5 @@ MIT
 [2]: https://github.com/javascript-studio/studio-cli
 [3]: https://javascript.studio
 [4]: https://github.com/javascript-studio/studio-log
-[5]: https://github.com/javascript-studio/studio-changes
+[5]: https://github.com/javascript-studio/studio-log-x
+[6]: https://github.com/javascript-studio/studio-changes
