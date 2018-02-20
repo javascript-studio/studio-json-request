@@ -1,5 +1,11 @@
 # Changes
 
+## 2.2.0
+
+- 🍏 Add child logger support and document logging
+- 📚 Add feature list
+- 📚 Document how to x-out confidential information
+
 ## 2.1.1
 
 - ✨ Improve error handing and logging
