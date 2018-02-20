@@ -8,6 +8,7 @@ const stream = require('stream');
 const EventEmitter = require('events');
 const sinon = require('sinon');
 const logger = require('@studio/log');
+const logX = require('@studio/log-x');
 const request = require('..');
 
 function fakeResponse() {
@@ -40,6 +41,7 @@ describe('request', () => {
 
   afterEach(() => {
     sandbox.restore();
+    logger.reset();
   });
 
   it('passes given options to `https.request`', () => {
@@ -750,6 +752,34 @@ describe('request', () => {
     req.emit('error', new Error('ECONREFUSED'));
 
     sinon.assert.calledOnce(child_log.error);
+  });
+
+  /*
+   * This test case demonstrates how to x-out a header field and does not
+   * actually test any code in this library.
+   */
+  it('replaces authorization header with @studio/log-x', (done) => {
+    const log = logger('Thingy');
+    log.filter('Request', logX('request.headers.Authorization'));
+
+    logger.out(new stream.Writable({
+      write(chunk) {
+        const entry = JSON.parse(chunk);
+        assert.equal(entry.data.request.headers.Authorization, '·····');
+        done();
+      }
+    }));
+
+    request({
+      hostname: 'javascript.studio',
+      headers: {
+        Authorization: 'Some Secret'
+      },
+      log
+    }, () => {});
+    res.statusCode = 200;
+    https.request.firstCall.yield(res);
+    res.on.withArgs('end').yield();
   });
 
 });

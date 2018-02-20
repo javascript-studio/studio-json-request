@@ -97,6 +97,35 @@ If `stream` was set, the log entry is produced once the response header was
 received without the `response` and `ms_body` properties, and another log entry
 is produced when the response body was received with `ms_body`.
 
+To remove confidential information from the logs, you can use [Studio Log X][5].
+For example, you can X-out all Authorization headers from the logs like this:
+
+```js
+const logger = require('@studio/log');
+const logX = require('@studio/log-x');
+
+// Install filter on namespace "Request":
+logger.filter('Request', logX('request.headers.Authorization'));
+```
+
+A more elaborate example, in case you have a custom parent logger:
+
+```js
+const request = require('@studio/json-request');
+const logger = require('@studio/log');
+const logX = require('@studio/log-x');
+
+const log = logger('Example');
+
+// Install filter on namespace "Example Request":
+log.filter('Request', logX('request.headers.Authorization'));
+
+request({
+  log: log, // pass parent logger
+  // ...
+}, () => {});
+```
+
 ## Related modules
 
 - 🎮 [Studio CLI][2] this module was initially developed for the [JavaScript
