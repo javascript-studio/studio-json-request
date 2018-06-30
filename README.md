@@ -102,28 +102,13 @@ For example, you can X-out all Authorization headers from the logs like this:
 
 ```js
 const logger = require('@studio/log');
+const Console = require('@studio/log-format/console');
 const logX = require('@studio/log-x');
 
 // Install filter on namespace "Request":
-logger.filter('Request', logX('request.headers.Authorization'));
-```
-
-A more elaborate example, in case you have a custom parent logger:
-
-```js
-const request = require('@studio/json-request');
-const logger = require('@studio/log');
-const logX = require('@studio/log-x');
-
-const log = logger('Example');
-
-// Install filter on namespace "Example Request":
-log.filter('Request', logX('request.headers.Authorization'));
-
-request({
-  log: log, // pass parent logger
-  // ...
-}, () => {});
+logger
+  .pipe(logX('request.headers.Authorization'))
+  .pipe(new Console());
 ```
 
 ## Related modules
