@@ -1,5 +1,14 @@
 # Changes
 
+## 3.0.0
+
+- 💥 [`685b9ab`](https://github.com/javascript-studio/studio-json-request/commit/685b9abe1cf87f4e18c2234e9e6a79b9045f2068)
+  BREAKING: Use Studio Log v2
+- 📚 [`9d827ee`](https://github.com/javascript-studio/studio-json-request/commit/9d827eea4dcbec7072dbf7c8a73c83ed07e5c6f6)
+  Change example code for Studio Log v2 changes
+- ✨ [`404184f`](https://github.com/javascript-studio/studio-json-request/commit/404184f03b28eb0e3d059b0a0ead0373d0bbb1fb)
+  Use Studio Changes `--commits` option
+
 ## 2.2.0
 
 - 🍏 Add child logger support and document logging
