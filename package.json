@@ -29,15 +29,15 @@
     "extends": "@studio"
   },
   "dependencies": {
-    "@studio/log": "^1.7.0"
+    "@studio/log": "^2.0.0"
   },
   "devDependencies": {
     "@studio/changes": "^1.4.0",
     "@studio/eslint-config": "^1.0.2",
     "@studio/log-x": "^1.1.0",
-    "eslint": "^3.0.1",
-    "mocha": "^3.4.2",
-    "sinon": "^2.3.4"
+    "eslint": "^5.0.1",
+    "mocha": "^5.2.0",
+    "sinon": "^6.0.1"
   },
   "repository": {
     "type": "git",

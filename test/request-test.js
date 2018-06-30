@@ -25,7 +25,6 @@ function fakeResponse() {
 describe('request', () => {
   let req;
   let res;
-  let sandbox;
   let clock;
 
   beforeEach(() => {
@@ -33,15 +32,14 @@ describe('request', () => {
     req.end = sinon.stub();
     req.abort = sinon.stub();
     res = fakeResponse();
-    sandbox = sinon.sandbox.create();
-    sandbox.stub(http, 'request').returns(req);
-    sandbox.stub(https, 'request').returns(req);
-    clock = sandbox.useFakeTimers();
+    sinon.stub(http, 'request').returns(req);
+    sinon.stub(https, 'request').returns(req);
+    clock = sinon.useFakeTimers();
   });
 
   afterEach(() => {
-    sandbox.restore();
-    logger.reset();
+    sinon.restore();
+    logger.pipe(null);
   });
 
   it('passes given options to `https.request`', () => {
@@ -628,7 +626,7 @@ describe('request', () => {
 
   function assertLogBody(content_type, body) {
     const log = logger('Request');
-    sandbox.stub(log, 'warn');
+    sinon.stub(log, 'warn');
 
     const spy = sinon.spy();
     request({
@@ -668,7 +666,7 @@ describe('request', () => {
 
   it('logs JSON request headers on request error event', () => {
     const log = logger('Request');
-    sandbox.stub(log, 'error');
+    sinon.stub(log, 'error');
     const spy = sinon.spy();
     request({
       hostname: 'that-host.com',
@@ -693,7 +691,7 @@ describe('request', () => {
 
   it('logs JSON request body on request error event', () => {
     const log = logger('Request');
-    sandbox.stub(log, 'error');
+    sinon.stub(log, 'error');
     const spy = sinon.spy();
     request({
       hostname: 'that-host.com',
@@ -718,7 +716,7 @@ describe('request', () => {
 
   it('does not log stream request body on request error event', () => {
     const log = logger('Request');
-    sandbox.stub(log, 'error');
+    sinon.stub(log, 'error');
     const spy = sinon.spy();
     request({
       hostname: 'that-host.com',
@@ -743,7 +741,7 @@ describe('request', () => {
   it('uses a child logger of the given logger', () => {
     const log = logger('custom');
     const child_log = log.child('Request');
-    sandbox.stub(child_log, 'error');
+    sinon.stub(child_log, 'error');
     request({
       log,
       hostname: 'that-host.com'
@@ -759,23 +757,22 @@ describe('request', () => {
    * actually test any code in this library.
    */
   it('replaces authorization header with @studio/log-x', (done) => {
-    const log = logger('Thingy');
-    log.filter('Request', logX('request.headers.Authorization'));
-
-    logger.out(new stream.Writable({
-      write(chunk) {
-        const entry = JSON.parse(chunk);
-        assert.equal(entry.data.request.headers.Authorization, '·····');
-        done();
-      }
-    }));
+    logger
+      .pipe(logX('request.headers.Authorization'))
+      .pipe(new stream.Writable({
+        objectMode: true,
+        write(entry) {
+          assert.equal(entry.data.request.headers.Authorization, '·····');
+          done();
+        }
+      }));
 
     request({
       hostname: 'javascript.studio',
       headers: {
         Authorization: 'Some Secret'
       },
-      log
+      log: logger('Thingy')
     }, () => {});
     res.statusCode = 200;
     https.request.firstCall.yield(res);
