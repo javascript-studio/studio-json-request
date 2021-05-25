@@ -673,8 +673,9 @@ describe('request', () => {
       headers: { some: 'header' }
     }, spy);
     clock.tick(17);
+    const error = new Error('ECONREFUSED');
 
-    req.emit('error', new Error('ECONREFUSED'));
+    req.emit('error', error);
 
     sinon.assert.calledWith(log.error, {
       ms: 17,
@@ -685,7 +686,7 @@ describe('request', () => {
         path: '/',
         headers: { some: 'header' }
       }
-    });
+    }, error);
     sinon.assert.calledOnce(spy);
   });
 
@@ -697,20 +698,17 @@ describe('request', () => {
       hostname: 'that-host.com',
     }, { is: 42 }, spy);
     clock.tick(17);
+    const error = new Error('ECONREFUSED');
 
-    req.emit('error', new Error('ECONREFUSED'));
+    req.emit('error', error);
 
     sinon.assert.calledWith(log.error, {
       ms: 17,
-      request: {
-        protocol: 'https',
-        method: 'GET',
-        host: 'that-host.com',
-        path: '/',
+      request: sinon.match({
         headers: { 'Content-Length': 9, 'Content-Type': 'application/json' },
         body: JSON.stringify({ is: 42 })
-      }
-    });
+      })
+    }, error);
     sinon.assert.calledOnce(spy);
   });
 
@@ -722,8 +720,9 @@ describe('request', () => {
       hostname: 'that-host.com',
     }, new stream.PassThrough(), spy);
     clock.tick(17);
+    const error = new Error('ECONREFUSED');
 
-    req.emit('error', new Error('ECONREFUSED'));
+    req.emit('error', error);
 
     sinon.assert.calledWith(log.error, {
       ms: 17,
@@ -734,7 +733,7 @@ describe('request', () => {
         path: '/',
         headers: undefined
       }
-    });
+    }, error);
     sinon.assert.calledOnce(spy);
   });
 
