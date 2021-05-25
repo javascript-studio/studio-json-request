@@ -9,9 +9,8 @@
   "scripts": {
     "lint": "eslint .",
     "test": "mocha",
-    "posttest": "npm run lint",
     "watch": "mocha --watch",
-    "preversion": "npm test",
+    "preversion": "npm run lint && npm test",
     "version": "changes --commits --footer",
     "postversion": "git push --follow-tags && npm publish"
   },
