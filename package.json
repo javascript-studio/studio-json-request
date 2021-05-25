@@ -35,7 +35,7 @@
     "@studio/changes": "^2.2.0",
     "@studio/eslint-config": "^1.1.1",
     "@studio/log-x": "^1.1.0",
-    "eslint": "^5.0.1",
+    "eslint": "^7.27.0",
     "mocha": "^5.2.0",
     "sinon": "^6.0.1"
   },
