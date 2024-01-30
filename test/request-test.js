@@ -182,9 +182,11 @@ describe('request', () => {
 
     assert.calledWith(fake, match({
       message: 'Expected response statusCode to be 2xx, but was 199',
-      code: 'E_EXPECT'
+      code: 'E_EXPECT',
+      properties: {
+        statusCode: 199
+      }
     }), null, res);
-    assert.equals(fake.firstCall.args[0].statusCode, 199);
   });
 
   it('fails the request if `statusCode` is > 299', () => {
@@ -197,9 +199,11 @@ describe('request', () => {
 
     assert.calledOnceWith(fake, match({
       message: 'Expected response statusCode to be 2xx, but was 300',
-      code: 'E_EXPECT'
+      code: 'E_EXPECT',
+      properties: {
+        statusCode: 300
+      }
     }), null, res);
-    assert.equals(fake.firstCall.args[0].statusCode, 300);
   });
 
   it('does not fail the request if `statusCode` is 201', () => {
@@ -223,12 +227,14 @@ describe('request', () => {
 
     assert.calledOnceWith(fake, match({
       message: 'Expected response statusCode to be 200, but was 201',
-      code: 'E_EXPECT'
+      code: 'E_EXPECT',
+      properties: {
+        statusCode: 201
+      }
     }), null, res);
     refute.calledWith(https.request, match({
       expect: 200
     }));
-    assert.equals(fake.firstCall.args[0].statusCode, 201);
   });
 
   it('does not fail request if `statusCode` equals `expect`', () => {
@@ -254,9 +260,11 @@ describe('request', () => {
       assert.calledOnceWith(fake, match({
         message: 'Expected response statusCode to be one of [200, 201], '
           + 'but was 202',
-        code: 'E_EXPECT'
+        code: 'E_EXPECT',
+        properties: {
+          statusCode: 202
+        }
       }), null, res);
-      assert.equals(fake.firstCall.args[0].statusCode, 202);
     });
 
   it('does not fail request if `statusCode` is in `expect` array', () => {
@@ -280,9 +288,13 @@ describe('request', () => {
     res.on.withArgs('end').yield();
 
     assert.calledOnceWith(fake, match({
-      name: 'SyntaxError',
-      message: sinon.match('Unexpected token'),
-      code: 'E_JSON'
+      name: 'Error',
+      message: 'Failed to parse response body',
+      code: 'E_JSON',
+      cause: match({
+        name: 'SyntaxError',
+        message: sinon.match('Unexpected token')
+      })
     }), '<html/>', res);
   });
 
@@ -354,7 +366,7 @@ describe('request', () => {
     clock.tick(5000);
     assert.calledOnceWithMatch(fake, {
       message: 'Request failure',
-      code: 'E_ERROR',
+      code: 'E_FAILED',
       cause: error
     });
   });
