@@ -1,7 +1,7 @@
 /*eslint-env mocha*/
 'use strict';
 
-const { assert, refute, sinon } = require('@sinonjs/referee-sinon');
+const { assert, refute, match, sinon } = require('@sinonjs/referee-sinon');
 const http = require('http');
 const request = require('..');
 
@@ -16,8 +16,7 @@ describe('integration', () => {
   it('request timeout', (done) => {
     server = http.createServer((_req, _res) => {});
     server.listen(() => {
-
-      const on_abort = sinon.fake();
+      const onError = sinon.fake();
       const req = request({
         protocol: 'http:',
         hostname: 'localhost',
@@ -27,12 +26,11 @@ describe('integration', () => {
         refute.isNull(err);
         assert.equals(err.message, 'Request timeout');
         setTimeout(() => {
-          assert.calledOnce(on_abort);
+          assert.calledOnceWith(onError, match({ message: 'socket hang up' }));
           done();
         }, 10);
       });
-      req.on('abort', on_abort);
-
+      req.on('error', onError);
     });
   });
 
@@ -51,7 +49,6 @@ describe('integration', () => {
       res.end();
     });
     server.listen(() => {
-
       request({
         protocol: 'http:',
         hostname: 'localhost',
@@ -64,8 +61,6 @@ describe('integration', () => {
         assert.equals(json, { hello: 'redirect' });
         done();
       });
-
     });
   });
-
 });
