@@ -22,6 +22,7 @@ function fakeResponse() {
 }
 
 describe('request', () => {
+  /** @type {Object} */
   let req;
   let res;
   let clock;
@@ -38,6 +39,7 @@ describe('request', () => {
 
   afterEach(() => {
     sinon.restore();
+    // @ts-ignore
     logger.pipe(null);
   });
 
@@ -99,6 +101,7 @@ describe('request', () => {
   it('yields parsed response body', () => {
     const fake = sinon.fake();
     request({}, fake);
+    // @ts-ignore
     https.request.callback(res);
 
     res.on.withArgs('data').yield(JSON.stringify({ some: 'payload' }));
@@ -177,6 +180,7 @@ describe('request', () => {
     request({}, null, fake);
 
     res.statusCode = 199;
+    // @ts-ignore
     https.request.callback(res);
     res.on.withArgs('end').yield();
 
@@ -194,6 +198,7 @@ describe('request', () => {
     request({}, null, fake);
 
     res.statusCode = 300;
+    // @ts-ignore
     https.request.callback(res);
     res.on.withArgs('end').yield();
 
@@ -211,6 +216,7 @@ describe('request', () => {
     request({}, null, fake);
 
     res.statusCode = 201;
+    // @ts-ignore
     https.request.callback(res);
     res.on.withArgs('end').yield();
 
@@ -222,6 +228,7 @@ describe('request', () => {
     request({ expect: 200 }, null, fake);
 
     res.statusCode = 201;
+    // @ts-ignore
     https.request.callback(res);
     res.on.withArgs('end').yield();
 
@@ -242,6 +249,7 @@ describe('request', () => {
     request({ expect: 200 }, null, fake);
 
     res.statusCode = 200;
+    // @ts-ignore
     https.request.callback(res);
     res.on.withArgs('end').yield();
 
@@ -254,6 +262,7 @@ describe('request', () => {
       request({ expect: [200, 201] }, null, fake);
 
       res.statusCode = 202;
+      // @ts-ignore
       https.request.callback(res);
       res.on.withArgs('end').yield();
 
@@ -272,6 +281,7 @@ describe('request', () => {
     request({ expect: [200, 304] }, null, fake);
 
     res.statusCode = 304;
+    // @ts-ignore
     https.request.callback(res);
     res.on.withArgs('end').yield();
 
@@ -283,6 +293,7 @@ describe('request', () => {
     request({}, null, fake);
 
     res.statusCode = 200;
+    // @ts-ignore
     https.request.callback(res);
     res.on.withArgs('data').yield('<html/>');
     res.on.withArgs('end').yield();
@@ -378,6 +389,7 @@ describe('request', () => {
       timeout: 5000
     }, fake);
 
+    // @ts-ignore
     https.request.callback(res);
     res.on.withArgs('data').yield(JSON.stringify({ some: 'payload' }));
     res.on.withArgs('end').yield();
@@ -393,6 +405,7 @@ describe('request', () => {
       timeout: 5000
     }, fake);
 
+    // @ts-ignore
     https.request.callback(res);
     res.on.withArgs('data').yield(JSON.stringify({ some: 'payload' }));
     clock.tick(5000);
@@ -411,6 +424,7 @@ describe('request', () => {
       }, fake);
 
       res.statusCode = 300;
+      // @ts-ignore
       https.request.callback(res);
       res.on.withArgs('end').yield();
       clock.tick(5000);
@@ -425,6 +439,7 @@ describe('request', () => {
     }, fake);
     delete res.headers['content-type'];
 
+    // @ts-ignore
     https.request.callback(res);
     res.on.withArgs('end').yield();
 
@@ -438,6 +453,7 @@ describe('request', () => {
     }, fake);
     res.headers['content-type'] = 'application/json; charset=utf-8';
 
+    // @ts-ignore
     https.request.callback(res);
     res.on.withArgs('data').yield(JSON.stringify({ some: 'payload' }));
     res.on.withArgs('end').yield();
@@ -452,6 +468,7 @@ describe('request', () => {
     }, fake);
     delete res.headers['content-type'];
 
+    // @ts-ignore
     https.request.callback(res);
     res.on.withArgs('data').yield(JSON.stringify({ some: 'payload' }));
     res.on.withArgs('end').yield();
@@ -466,6 +483,7 @@ describe('request', () => {
       stream: true
     }, fake);
 
+    // @ts-ignore
     https.request.callback(res);
 
     assert.calledOnceWith(fake, null, res);
@@ -482,6 +500,7 @@ describe('request', () => {
     }, fake);
 
     res.statusCode = 300;
+    // @ts-ignore
     https.request.callback(res);
     res.on.withArgs('end').yield();
 
@@ -498,6 +517,7 @@ describe('request', () => {
     res.statusCode = 302;
     delete res.headers['content-type'];
     res.headers.location = 'https://other-host.com/some/path';
+    // @ts-ignore
     https.request.callback(res);
 
     assert.calledTwice(https.request);
@@ -517,9 +537,11 @@ describe('request', () => {
     res.statusCode = 302;
     delete res.headers['content-type'];
     res.headers.location = 'https://other-host.com/some/path';
+    // @ts-ignore
     https.request.firstCall.yield(res);
 
     res = fakeResponse();
+    // @ts-ignore
     https.request.secondCall.yield(res);
     res.on.withArgs('data').yield(JSON.stringify({ some: 'payload' }));
     res.on.withArgs('end').yield();
@@ -543,9 +565,11 @@ describe('request', () => {
     res.statusCode = 302;
     delete res.headers['content-type'];
     res.headers.location = '/some/path';
+    // @ts-ignore
     https.request.callback(res);
 
     assert.calledTwice(https.request);
+    // @ts-ignore
     assert.calledWithMatch(https.request.secondCall, {
       hostname: 'that-host.com',
       port: '8080',
@@ -565,7 +589,9 @@ describe('request', () => {
     delete res.headers['content-type'];
     res.headers.location = '/some/path';
     res.on.withArgs('end').yields();
+    // @ts-ignore
     https.request.firstCall.yield(res);
+    // @ts-ignore
     https.request.secondCall.yield(res);
 
     assert.calledOnceWithMatch(fake, {
@@ -586,7 +612,9 @@ describe('request', () => {
     delete res.headers['content-type'];
     res.headers.location = '/some/path';
     res.on.withArgs('end').yields();
+    // @ts-ignore
     https.request.firstCall.yield(res);
+    // @ts-ignore
     https.request.secondCall.yield(res);
 
     assert.calledOnceWithMatch(fake, {
@@ -607,6 +635,7 @@ describe('request', () => {
 
     res.statusCode = 403;
     res.headers['content-type'] = content_type;
+    // @ts-ignore
     https.request.firstCall.yield(res);
     res.on.withArgs('data').yield(body);
     res.on.withArgs('end').yield();
@@ -745,6 +774,7 @@ describe('request', () => {
       log: logger('Thingy')
     }, () => {});
     res.statusCode = 200;
+    // @ts-ignore
     https.request.firstCall.yield(res);
     res.on.withArgs('end').yield();
   });
