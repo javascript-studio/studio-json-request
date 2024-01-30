@@ -20,6 +20,7 @@ describe('integration', () => {
       const on_abort = sinon.fake();
       const req = request({
         protocol: 'http:',
+        hostname: 'localhost',
         port: server.address().port,
         timeout: 10
       }, (err) => {
@@ -53,6 +54,7 @@ describe('integration', () => {
 
       request({
         protocol: 'http:',
+        hostname: 'localhost',
         port: server.address().port,
         path: '/',
         expect: [200, 302]

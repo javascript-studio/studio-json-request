@@ -4,7 +4,7 @@
   "description": "A tiny Node HTTP(S) request wrapper, for JSON requests and responses",
   "main": "lib/request.js",
   "engines": {
-    "node": ">=4.0.0"
+    "node": ">=16.0.0"
   },
   "scripts": {
     "lint": "eslint .",
@@ -33,9 +33,9 @@
   "devDependencies": {
     "@sinonjs/referee-sinon": "^12.0.0",
     "@studio/changes": "^2.2.0",
-    "@studio/eslint-config": "^1.1.1",
+    "@studio/eslint-config": "^6.0.0",
     "@studio/log-x": "^1.1.0",
-    "eslint": "^7.27.0",
+    "eslint": "^8.56.0",
     "mocha": "^10.2.0"
   },
   "repository": {

@@ -129,13 +129,13 @@ describe('request', () => {
   });
 
   it('sends the request with stream payload', () => {
-    const stream = { pipe: sinon.fake() };
+    const fake_stream = { pipe: sinon.fake() };
 
     request({
       method: 'POST',
       hostname: 'that-host.com',
       path: '/'
-    }, stream, () => {});
+    }, fake_stream, () => {});
 
     assert.calledOnceWith(https.request, {
       method: 'POST',
@@ -143,16 +143,16 @@ describe('request', () => {
       path: '/'
     });
     refute.called(req.end);
-    assert.calledOnceWith(stream.pipe, req);
+    assert.calledOnceWith(fake_stream.pipe, req);
   });
 
   it('sends the request without payload or additional headers', () => {
     request({
-      hostname: 'that-host.com',
+      hostname: 'that-host.com'
     }, null, () => {});
 
     assert.calledOnceWith(https.request, {
-      hostname: 'that-host.com',
+      hostname: 'that-host.com'
     });
     assert.calledOnceWithExactly(req.end);
   });
@@ -654,7 +654,7 @@ describe('request', () => {
     sinon.replace(log, 'error', sinon.fake());
     const fake = sinon.fake();
     request({
-      hostname: 'that-host.com',
+      hostname: 'that-host.com'
     }, { is: 42 }, fake);
     clock.tick(17);
     const error = new Error('ECONREFUSED');
@@ -676,7 +676,7 @@ describe('request', () => {
     sinon.replace(log, 'error', sinon.fake());
     const fake = sinon.fake();
     request({
-      hostname: 'that-host.com',
+      hostname: 'that-host.com'
     }, new stream.PassThrough(), fake);
     clock.tick(17);
     const error = new Error('ECONREFUSED');
