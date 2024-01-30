@@ -1,12 +1,11 @@
 /*eslint-env mocha*/
 'use strict';
 
-const assert = require('assert');
+const { assert, refute, match, sinon } = require('@sinonjs/referee-sinon');
 const http = require('http');
 const https = require('https');
 const stream = require('stream');
 const EventEmitter = require('events');
-const sinon = require('sinon');
 const logger = require('@studio/log');
 const logX = require('@studio/log-x');
 const request = require('..');
@@ -49,8 +48,7 @@ describe('request', () => {
       path: '/'
     }, () => {});
 
-    sinon.assert.calledOnce(https.request);
-    sinon.assert.calledWith(https.request, {
+    assert.calledOnceWith(https.request, {
       method: 'POST',
       hostname: 'that-host.com',
       path: '/'
@@ -65,8 +63,7 @@ describe('request', () => {
       path: '/'
     }, () => {});
 
-    sinon.assert.calledOnce(http.request);
-    sinon.assert.calledWith(http.request, {
+    assert.calledOnceWith(http.request, {
       method: 'POST',
       hostname: 'that-host.com',
       path: '/'
@@ -81,8 +78,7 @@ describe('request', () => {
       path: '/'
     }, () => {});
 
-    sinon.assert.calledOnce(https.request);
-    sinon.assert.calledWith(https.request, {
+    assert.calledOnceWith(https.request, {
       method: 'POST',
       hostname: 'that-host.com',
       path: '/'
@@ -90,14 +86,14 @@ describe('request', () => {
   });
 
   it('throws on invalid protocol', () => {
-    assert.throws(() => {
+    assert.exception(() => {
       request({
         protocol: 'ftp:',
         method: 'GET',
         hostname: 'that-host.com',
         path: '/'
       }, () => {});
-    }, /^Error: Unsupported protocol "ftp:"$/);
+    }, { message: 'Unsupported protocol "ftp:"' });
   });
 
   it('yields parsed response body', () => {
@@ -108,8 +104,7 @@ describe('request', () => {
     res.on.withArgs('data').yield(JSON.stringify({ some: 'payload' }));
     res.on.withArgs('end').yield();
 
-    sinon.assert.calledOnce(spy);
-    sinon.assert.calledWith(spy, null, { some: 'payload' }, res);
+    assert.calledOnceWith(spy, null, { some: 'payload' }, res);
   });
 
   it('sends the request with JSON payload and additional headers', () => {
@@ -121,8 +116,7 @@ describe('request', () => {
       path: '/'
     }, payload, () => {});
 
-    sinon.assert.calledOnce(https.request);
-    sinon.assert.calledWith(https.request, {
+    assert.calledOnceWith(https.request, {
       method: 'POST',
       hostname: 'that-host.com',
       path: '/',
@@ -131,8 +125,7 @@ describe('request', () => {
         'Content-Type': 'application/json'
       }
     });
-    sinon.assert.calledOnce(req.end);
-    sinon.assert.calledWith(req.end, JSON.stringify(payload));
+    assert.calledOnceWith(req.end, JSON.stringify(payload));
   });
 
   it('sends the request with stream payload', () => {
@@ -144,15 +137,13 @@ describe('request', () => {
       path: '/'
     }, stream, () => {});
 
-    sinon.assert.calledOnce(https.request);
-    sinon.assert.calledWith(https.request, {
+    assert.calledOnceWith(https.request, {
       method: 'POST',
       hostname: 'that-host.com',
       path: '/'
     });
-    sinon.assert.notCalled(req.end);
-    sinon.assert.calledOnce(stream.pipe);
-    sinon.assert.calledWith(stream.pipe, req);
+    refute.called(req.end);
+    assert.calledOnceWith(stream.pipe, req);
   });
 
   it('sends the request without payload or additional headers', () => {
@@ -160,12 +151,10 @@ describe('request', () => {
       hostname: 'that-host.com',
     }, null, () => {});
 
-    sinon.assert.calledOnce(https.request);
-    sinon.assert.calledWith(https.request, {
+    assert.calledOnceWith(https.request, {
       hostname: 'that-host.com',
     });
-    sinon.assert.calledOnce(req.end);
-    sinon.assert.calledWithExactly(req.end);
+    assert.calledOnceWithExactly(req.end);
   });
 
   it('does not override existing `Content-Type` header', () => {
@@ -175,8 +164,7 @@ describe('request', () => {
       }
     }, { some: 'payload' }, () => {});
 
-    sinon.assert.calledOnce(https.request);
-    sinon.assert.calledWithMatch(https.request, {
+    assert.calledOnceWithMatch(https.request, {
       headers: {
         'Content-Length': 18,
         'Content-Type': 'application/vnd.github.v3+json'
@@ -192,13 +180,11 @@ describe('request', () => {
     https.request.yield(res);
     res.on.withArgs('end').yield();
 
-    sinon.assert.calledOnce(spy);
-    sinon.assert.calledWith(spy, sinon.match.instanceOf(Error), null, res);
-    sinon.assert.calledWithMatch(spy, {
+    assert.calledWith(spy, match({
       message: 'Expected response statusCode to be 2xx, but was 199',
       code: 'E_EXPECT'
-    });
-    assert.equal(spy.firstCall.args[0].statusCode, 199);
+    }), null, res);
+    assert.equals(spy.firstCall.args[0].statusCode, 199);
   });
 
   it('fails the request if `statusCode` is > 299', () => {
@@ -209,13 +195,11 @@ describe('request', () => {
     https.request.yield(res);
     res.on.withArgs('end').yield();
 
-    sinon.assert.calledOnce(spy);
-    sinon.assert.calledWith(spy, sinon.match.instanceOf(Error), null, res);
-    sinon.assert.calledWithMatch(spy, {
+    assert.calledOnceWith(spy, match({
       message: 'Expected response statusCode to be 2xx, but was 300',
       code: 'E_EXPECT'
-    });
-    assert.equal(spy.firstCall.args[0].statusCode, 300);
+    }), null, res);
+    assert.equals(spy.firstCall.args[0].statusCode, 300);
   });
 
   it('does not fail the request if `statusCode` is 201', () => {
@@ -226,8 +210,7 @@ describe('request', () => {
     https.request.yield(res);
     res.on.withArgs('end').yield();
 
-    sinon.assert.calledOnce(spy);
-    sinon.assert.calledWith(spy, null, null, res);
+    assert.calledOnceWith(spy, null, null, res);
   });
 
   it('fails request if `statusCode` is 201 and `expect` is set to 200', () => {
@@ -238,16 +221,14 @@ describe('request', () => {
     https.request.yield(res);
     res.on.withArgs('end').yield();
 
-    sinon.assert.calledOnce(spy);
-    sinon.assert.calledWith(spy, sinon.match.instanceOf(Error), null, res);
-    sinon.assert.calledWithMatch(spy, {
+    assert.calledOnceWith(spy, match({
       message: 'Expected response statusCode to be 200, but was 201',
       code: 'E_EXPECT'
-    });
-    sinon.assert.neverCalledWithMatch(https.request, {
+    }), null, res);
+    refute.calledWith(https.request, match({
       expect: 200
-    });
-    assert.equal(spy.firstCall.args[0].statusCode, 201);
+    }));
+    assert.equals(spy.firstCall.args[0].statusCode, 201);
   });
 
   it('does not fail request if `statusCode` equals `expect`', () => {
@@ -258,8 +239,7 @@ describe('request', () => {
     https.request.yield(res);
     res.on.withArgs('end').yield();
 
-    sinon.assert.calledOnce(spy);
-    sinon.assert.calledWith(spy, null, null, res);
+    assert.calledOnceWith(spy, null, null, res);
   });
 
   it('fails request if `statusCode` is 202 and `expect` is set to [200, 201]',
@@ -271,14 +251,12 @@ describe('request', () => {
       https.request.yield(res);
       res.on.withArgs('end').yield();
 
-      sinon.assert.calledOnce(spy);
-      sinon.assert.calledWith(spy, sinon.match.instanceOf(Error), null, res);
-      sinon.assert.calledWithMatch(spy, {
+      assert.calledOnceWith(spy, match({
         message: 'Expected response statusCode to be one of [200, 201], '
           + 'but was 202',
         code: 'E_EXPECT'
-      });
-      assert.equal(spy.firstCall.args[0].statusCode, 202);
+      }), null, res);
+      assert.equals(spy.firstCall.args[0].statusCode, 202);
     });
 
   it('does not fail request if `statusCode` is in `expect` array', () => {
@@ -289,8 +267,7 @@ describe('request', () => {
     https.request.yield(res);
     res.on.withArgs('end').yield();
 
-    sinon.assert.calledOnce(spy);
-    sinon.assert.calledWith(spy, null, null, res);
+    assert.calledOnceWith(spy, null, null, res);
   });
 
   it('fails request if response is not valid JSON', () => {
@@ -302,13 +279,11 @@ describe('request', () => {
     res.on.withArgs('data').yield('<html/>');
     res.on.withArgs('end').yield();
 
-    sinon.assert.calledOnce(spy);
-    sinon.assert.calledWith(spy, sinon.match.instanceOf(Error), '<html/>', res);
-    sinon.assert.calledWithMatch(spy, {
+    assert.calledOnceWith(spy, match({
       name: 'SyntaxError',
-      message: sinon.match('Unexpected token <'),
+      message: sinon.match('Unexpected token'),
       code: 'E_JSON'
-    });
+    }), '<html/>', res);
   });
 
   it('sets a timeout, but does not pass the option on', () => {
@@ -319,18 +294,15 @@ describe('request', () => {
       timeout: 5000
     }, spy);
 
-    sinon.assert.calledOnce(https.request);
-    sinon.assert.calledWith(https.request, {
+    assert.calledOnceWith(https.request, {
       hostname: 'that-host.com'
     });
     clock.tick(5000);
-    sinon.assert.calledOnce(spy);
-    sinon.assert.calledWith(spy, sinon.match.instanceOf(Error));
-    sinon.assert.calledOnce(req.abort);
-    sinon.assert.calledWithMatch(spy, {
+    assert.calledOnceWith(spy, match({
       message: 'Request timeout',
       code: 'E_TIMEOUT'
-    });
+    }));
+    assert.calledOnce(req.abort);
   });
 
   it('does not modify the original options', () => {
@@ -341,7 +313,7 @@ describe('request', () => {
 
     request(options, { generate: 'Content-Length header' }, () => {});
 
-    assert.deepEqual(options, {
+    assert.equals(options, {
       hostname: 'that-host.com',
       timeout: 5000
     });
@@ -355,7 +327,7 @@ describe('request', () => {
 
     request(options, { generate: 'Content-Length header' }, () => {});
 
-    assert.deepEqual(options.headers, {});
+    assert.equals(options.headers, {});
   });
 
   it('does not set a timeout if not configured', () => {
@@ -366,7 +338,7 @@ describe('request', () => {
     }, spy);
 
     clock.tick(5000);
-    sinon.assert.notCalled(spy);
+    refute.called(spy);
   });
 
   it('clears the timeout on error', () => {
@@ -380,8 +352,7 @@ describe('request', () => {
 
     req.emit('error', error);
     clock.tick(5000);
-    sinon.assert.calledOnce(spy);
-    sinon.assert.calledWithMatch(spy, {
+    assert.calledOnceWithMatch(spy, {
       message: 'Request failure',
       code: 'E_ERROR',
       cause: error
@@ -400,8 +371,7 @@ describe('request', () => {
     res.on.withArgs('end').yield();
 
     clock.tick(5000);
-    sinon.assert.calledOnce(spy);
-    sinon.assert.calledWith(spy, null, { some: 'payload' }, res);
+    assert.calledOnceWith(spy, null, { some: 'payload' }, res);
   });
 
   it('does not fail if the response processing takes longer', () => {
@@ -416,8 +386,7 @@ describe('request', () => {
     clock.tick(5000);
     res.on.withArgs('end').yield();
 
-    sinon.assert.calledOnce(spy);
-    sinon.assert.calledWith(spy, null, { some: 'payload' }, res);
+    assert.calledOnceWith(spy, null, { some: 'payload' }, res);
   });
 
   it('does not invoke the callback twice on timeout after unexpected response',
@@ -434,8 +403,7 @@ describe('request', () => {
       res.on.withArgs('end').yield();
       clock.tick(5000);
 
-      sinon.assert.calledOnce(spy);
-      sinon.assert.calledWith(spy, sinon.match.instanceOf(Error));
+      assert.calledOnceWith(spy, sinon.match.instanceOf(Error));
     });
 
   it('does not fail if response is empty and not application/json', () => {
@@ -448,8 +416,7 @@ describe('request', () => {
     https.request.yield(res);
     res.on.withArgs('end').yield();
 
-    sinon.assert.calledOnce(spy);
-    sinon.assert.calledWith(spy, null, null, res);
+    assert.calledOnceWith(spy, null, null, res);
   });
 
   it('parses body if Content-Type is application/json; charset=utf-8', () => {
@@ -463,8 +430,7 @@ describe('request', () => {
     res.on.withArgs('data').yield(JSON.stringify({ some: 'payload' }));
     res.on.withArgs('end').yield();
 
-    sinon.assert.calledOnce(spy);
-    sinon.assert.calledWith(spy, null, { some: 'payload' }, res);
+    assert.calledOnceWith(spy, null, { some: 'payload' }, res);
   });
 
   it('does not throw if content-type is not provided', () => {
@@ -478,8 +444,7 @@ describe('request', () => {
     res.on.withArgs('data').yield(JSON.stringify({ some: 'payload' }));
     res.on.withArgs('end').yield();
 
-    sinon.assert.calledOnce(spy);
-    sinon.assert.calledWith(spy, null, null, res);
+    assert.calledOnceWith(spy, null, null, res);
   });
 
   it('returns the response instead of parsing it if `stream: true`', () => {
@@ -491,10 +456,9 @@ describe('request', () => {
 
     https.request.yield(res);
 
-    sinon.assert.calledOnce(spy);
-    sinon.assert.calledWith(spy, null, res);
+    assert.calledOnceWith(spy, null, res);
     // Assert no data listeners are installed:
-    sinon.assert.notCalled(res.on.withArgs('data'));
+    refute.calledWith(res.on, 'data');
   });
 
   it('performs `expect` check if `stream: true`', () => {
@@ -509,8 +473,7 @@ describe('request', () => {
     https.request.yield(res);
     res.on.withArgs('end').yield();
 
-    sinon.assert.calledOnce(spy);
-    sinon.assert.calledWith(spy, sinon.match.instanceOf(Error));
+    assert.calledOnceWith(spy, sinon.match.instanceOf(Error));
   });
 
   it('follows redirect if `stream: true`', () => {
@@ -525,8 +488,8 @@ describe('request', () => {
     res.headers.location = 'https://other-host.com/some/path';
     https.request.yield(res);
 
-    sinon.assert.calledTwice(https.request);
-    sinon.assert.calledWithMatch(https.request, {
+    assert.calledTwice(https.request);
+    assert.calledWithMatch(https.request, {
       hostname: 'other-host.com',
       path: '/some/path'
     });
@@ -549,13 +512,12 @@ describe('request', () => {
     res.on.withArgs('data').yield(JSON.stringify({ some: 'payload' }));
     res.on.withArgs('end').yield();
 
-    sinon.assert.calledTwice(https.request);
-    sinon.assert.calledWithMatch(https.request, {
+    assert.calledTwice(https.request);
+    assert.calledWithMatch(https.request, {
       hostname: 'other-host.com',
       path: '/some/path'
     });
-    sinon.assert.calledOnce(spy);
-    sinon.assert.calledWith(spy, null, { some: 'payload' });
+    assert.calledOnceWith(spy, null, { some: 'payload' });
   });
 
   it('retains host and port if redirect location is only a path', () => {
@@ -571,8 +533,8 @@ describe('request', () => {
     res.headers.location = '/some/path';
     https.request.yield(res);
 
-    sinon.assert.calledTwice(https.request);
-    sinon.assert.calledWithMatch(https.request.secondCall, {
+    assert.calledTwice(https.request);
+    assert.calledWithMatch(https.request.secondCall, {
       hostname: 'that-host.com',
       port: '8080',
       path: '/some/path'
@@ -594,8 +556,7 @@ describe('request', () => {
     https.request.firstCall.yield(res);
     https.request.secondCall.yield(res);
 
-    sinon.assert.calledOnce(spy);
-    sinon.assert.calledWithMatch(spy, {
+    assert.calledOnceWithMatch(spy, {
       message: 'Expected response statusCode to be 200, but was 302',
       code: 'E_EXPECT'
     });
@@ -616,8 +577,7 @@ describe('request', () => {
     https.request.firstCall.yield(res);
     https.request.secondCall.yield(res);
 
-    sinon.assert.calledOnce(spy);
-    sinon.assert.calledWithMatch(spy, {
+    assert.calledOnceWithMatch(spy, {
       message:
         'Expected response statusCode to be one of [200, 201], but was 302',
       code: 'E_EXPECT'
@@ -639,8 +599,7 @@ describe('request', () => {
     res.on.withArgs('data').yield(body);
     res.on.withArgs('end').yield();
 
-    sinon.assert.calledOnce(log.warn);
-    sinon.assert.calledWithMatch(log.warn, {
+    assert.calledOnceWithMatch(log.warn, {
       request: {
         protocol: 'https',
         method: 'GET',
@@ -653,7 +612,7 @@ describe('request', () => {
         body
       }
     });
-    sinon.assert.calledOnce(spy);
+    assert.calledOnce(spy);
   }
 
   it('logs body if content type is text/plain', () => {
@@ -677,7 +636,7 @@ describe('request', () => {
 
     req.emit('error', error);
 
-    sinon.assert.calledWith(log.error, {
+    assert.calledWith(log.error, {
       ms: 17,
       request: {
         protocol: 'https',
@@ -687,7 +646,7 @@ describe('request', () => {
         headers: { some: 'header' }
       }
     }, error);
-    sinon.assert.calledOnce(spy);
+    assert.calledOnce(spy);
   });
 
   it('logs JSON request body on request error event', () => {
@@ -702,14 +661,14 @@ describe('request', () => {
 
     req.emit('error', error);
 
-    sinon.assert.calledWith(log.error, {
+    assert.calledWith(log.error, {
       ms: 17,
       request: sinon.match({
         headers: { 'Content-Length': 9, 'Content-Type': 'application/json' },
         body: JSON.stringify({ is: 42 })
       })
     }, error);
-    sinon.assert.calledOnce(spy);
+    assert.calledOnce(spy);
   });
 
   it('does not log stream request body on request error event', () => {
@@ -724,7 +683,7 @@ describe('request', () => {
 
     req.emit('error', error);
 
-    sinon.assert.calledWith(log.error, {
+    assert.calledWith(log.error, {
       ms: 17,
       request: {
         protocol: 'https',
@@ -734,7 +693,7 @@ describe('request', () => {
         headers: undefined
       }
     }, error);
-    sinon.assert.calledOnce(spy);
+    assert.calledOnce(spy);
   });
 
   it('uses a child logger of the given logger', () => {
@@ -748,7 +707,7 @@ describe('request', () => {
 
     req.emit('error', new Error('ECONREFUSED'));
 
-    sinon.assert.calledOnce(child_log.error);
+    assert.calledOnce(child_log.error);
   });
 
   /*
@@ -761,7 +720,7 @@ describe('request', () => {
       .pipe(new stream.Writable({
         objectMode: true,
         write(entry) {
-          assert.equal(entry.data.request.headers.Authorization, '·····');
+          assert.equals(entry.data.request.headers.Authorization, '·····');
           done();
         }
       }));
