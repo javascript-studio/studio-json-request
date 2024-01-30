@@ -1,5 +1,30 @@
 # Changes
 
+## 4.0.0
+
+- 💥 [`71e18e1`](https://github.com/javascript-studio/studio-json-request/commit/71e18e11b3c7bcfccd002020755d38f2b64a10c5)
+  Drop node 12 and 14, support node 18 and 20
+- 💥 [`65e3d9b`](https://github.com/javascript-studio/studio-json-request/commit/65e3d9bc2acac462b1a3c67082e84335fcef7f07)
+  Use Studio Fail
+- 💥 [`ddbd041`](https://github.com/javascript-studio/studio-json-request/commit/ddbd041f498edddb195ffba9c35a331a1128a683)
+  Destroy request instead of abort
+- 🍏 [`9ce212a`](https://github.com/javascript-studio/studio-json-request/commit/9ce212a053afc79a765f7a766e251b1c75c5cf8f)
+  Add types
+- ✨ [`0d510aa`](https://github.com/javascript-studio/studio-json-request/commit/0d510aad60c326e970152d1f1af19188ed1b19db)
+  Upgrade Studio Changes
+- ✨ [`df96e6b`](https://github.com/javascript-studio/studio-json-request/commit/df96e6bf11cb90995fcf2d42eed9efc053ee56a3)
+  Update Studio Log and Studio Log X
+- ✨ [`4d1de86`](https://github.com/javascript-studio/studio-json-request/commit/4d1de86f36cbe5fa61feb0ebf3d96cc379da0663)
+  Upgrade eslint-config and eslint and use URL
+- ✨ [`57bb923`](https://github.com/javascript-studio/studio-json-request/commit/57bb9230dd9871be35f917f858721c7de5e730a0)
+  Replace sinon spy and stub with fakes
+- ✨ [`f23a336`](https://github.com/javascript-studio/studio-json-request/commit/f23a33675b3951c36d40d8a45552b102bcc1897b)
+  Replace assert and sinon with referee-sinon
+- ✨ [`2def327`](https://github.com/javascript-studio/studio-json-request/commit/2def32775b8e0611b65a9b4a9b5155d6e36582d9)
+  Upgrade mocha to v10
+
+_Released by [Maximilian Antoni](https://github.com/mantoni) on 2024-01-30._
+
 ## 3.0.1
 
 - 🐛 [`f8e06d4`](https://github.com/javascript-studio/studio-json-request/commit/f8e06d44f8cff1de0e8d3e877313ca53a4fa589f)

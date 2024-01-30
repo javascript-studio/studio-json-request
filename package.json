@@ -1,6 +1,6 @@
 {
   "name": "@studio/json-request",
-  "version": "3.0.1",
+  "version": "4.0.0",
   "description": "A tiny Node HTTP(S) request wrapper, for JSON requests and responses",
   "main": "lib/request.js",
   "engines": {
