@@ -26,6 +26,10 @@ jobs:
       - name: Install
         run: npm ci
       - name: Lint
+        if: matrix.node-version == '20.x'
         run: npm run lint
+      - name: Types
+        if: matrix.node-version == '20.x'
+        run: node_modules/.bin/tsc
       - name: Test
         run: npm test

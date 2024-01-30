@@ -5,6 +5,9 @@ const { assert, refute, match, sinon } = require('@sinonjs/referee-sinon');
 const http = require('http');
 const request = require('..');
 
+/**
+ * @typedef {import('http').IncomingMessage} IncomingMessage
+ */
 
 describe('integration', () => {
   let server;
@@ -24,7 +27,7 @@ describe('integration', () => {
         timeout: 10
       }, (err) => {
         refute.isNull(err);
-        assert.equals(err.message, 'Request timeout');
+        assert.equals(/** @type {Error} */ (err).message, 'Request timeout');
         setTimeout(() => {
           assert.calledOnceWith(onError, match({ message: 'socket hang up' }));
           done();
@@ -57,7 +60,7 @@ describe('integration', () => {
         expect: [200, 302]
       }, (err, json, res) => {
         assert.isNull(err);
-        assert.equals(res.statusCode, 200);
+        assert.equals(/** @type {IncomingMessage} */ (res).statusCode, 200);
         assert.equals(json, { hello: 'redirect' });
         done();
       });
