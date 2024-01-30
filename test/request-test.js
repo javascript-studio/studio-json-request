@@ -28,11 +28,11 @@ describe('request', () => {
 
   beforeEach(() => {
     req = new EventEmitter();
-    req.end = sinon.stub();
-    req.abort = sinon.stub();
+    req.end = sinon.fake();
+    req.abort = sinon.fake();
     res = fakeResponse();
-    sinon.stub(http, 'request').returns(req);
-    sinon.stub(https, 'request').returns(req);
+    sinon.replace(http, 'request', sinon.fake.returns(req));
+    sinon.replace(https, 'request', sinon.fake.returns(req));
     clock = sinon.useFakeTimers();
   });
 
@@ -97,14 +97,14 @@ describe('request', () => {
   });
 
   it('yields parsed response body', () => {
-    const spy = sinon.spy();
-    request({}, spy);
-    https.request.yield(res);
+    const fake = sinon.fake();
+    request({}, fake);
+    https.request.callback(res);
 
     res.on.withArgs('data').yield(JSON.stringify({ some: 'payload' }));
     res.on.withArgs('end').yield();
 
-    assert.calledOnceWith(spy, null, { some: 'payload' }, res);
+    assert.calledOnceWith(fake, null, { some: 'payload' }, res);
   });
 
   it('sends the request with JSON payload and additional headers', () => {
@@ -129,7 +129,7 @@ describe('request', () => {
   });
 
   it('sends the request with stream payload', () => {
-    const stream = { pipe: sinon.stub() };
+    const stream = { pipe: sinon.fake() };
 
     request({
       method: 'POST',
@@ -173,113 +173,113 @@ describe('request', () => {
   });
 
   it('fails the request if `statusCode` is < 200', () => {
-    const spy = sinon.spy();
-    request({}, null, spy);
+    const fake = sinon.fake();
+    request({}, null, fake);
 
     res.statusCode = 199;
-    https.request.yield(res);
+    https.request.callback(res);
     res.on.withArgs('end').yield();
 
-    assert.calledWith(spy, match({
+    assert.calledWith(fake, match({
       message: 'Expected response statusCode to be 2xx, but was 199',
       code: 'E_EXPECT'
     }), null, res);
-    assert.equals(spy.firstCall.args[0].statusCode, 199);
+    assert.equals(fake.firstCall.args[0].statusCode, 199);
   });
 
   it('fails the request if `statusCode` is > 299', () => {
-    const spy = sinon.spy();
-    request({}, null, spy);
+    const fake = sinon.fake();
+    request({}, null, fake);
 
     res.statusCode = 300;
-    https.request.yield(res);
+    https.request.callback(res);
     res.on.withArgs('end').yield();
 
-    assert.calledOnceWith(spy, match({
+    assert.calledOnceWith(fake, match({
       message: 'Expected response statusCode to be 2xx, but was 300',
       code: 'E_EXPECT'
     }), null, res);
-    assert.equals(spy.firstCall.args[0].statusCode, 300);
+    assert.equals(fake.firstCall.args[0].statusCode, 300);
   });
 
   it('does not fail the request if `statusCode` is 201', () => {
-    const spy = sinon.spy();
-    request({}, null, spy);
+    const fake = sinon.fake();
+    request({}, null, fake);
 
     res.statusCode = 201;
-    https.request.yield(res);
+    https.request.callback(res);
     res.on.withArgs('end').yield();
 
-    assert.calledOnceWith(spy, null, null, res);
+    assert.calledOnceWith(fake, null, null, res);
   });
 
   it('fails request if `statusCode` is 201 and `expect` is set to 200', () => {
-    const spy = sinon.spy();
-    request({ expect: 200 }, null, spy);
+    const fake = sinon.fake();
+    request({ expect: 200 }, null, fake);
 
     res.statusCode = 201;
-    https.request.yield(res);
+    https.request.callback(res);
     res.on.withArgs('end').yield();
 
-    assert.calledOnceWith(spy, match({
+    assert.calledOnceWith(fake, match({
       message: 'Expected response statusCode to be 200, but was 201',
       code: 'E_EXPECT'
     }), null, res);
     refute.calledWith(https.request, match({
       expect: 200
     }));
-    assert.equals(spy.firstCall.args[0].statusCode, 201);
+    assert.equals(fake.firstCall.args[0].statusCode, 201);
   });
 
   it('does not fail request if `statusCode` equals `expect`', () => {
-    const spy = sinon.spy();
-    request({ expect: 200 }, null, spy);
+    const fake = sinon.fake();
+    request({ expect: 200 }, null, fake);
 
     res.statusCode = 200;
-    https.request.yield(res);
+    https.request.callback(res);
     res.on.withArgs('end').yield();
 
-    assert.calledOnceWith(spy, null, null, res);
+    assert.calledOnceWith(fake, null, null, res);
   });
 
   it('fails request if `statusCode` is 202 and `expect` is set to [200, 201]',
     () => {
-      const spy = sinon.spy();
-      request({ expect: [200, 201] }, null, spy);
+      const fake = sinon.fake();
+      request({ expect: [200, 201] }, null, fake);
 
       res.statusCode = 202;
-      https.request.yield(res);
+      https.request.callback(res);
       res.on.withArgs('end').yield();
 
-      assert.calledOnceWith(spy, match({
+      assert.calledOnceWith(fake, match({
         message: 'Expected response statusCode to be one of [200, 201], '
           + 'but was 202',
         code: 'E_EXPECT'
       }), null, res);
-      assert.equals(spy.firstCall.args[0].statusCode, 202);
+      assert.equals(fake.firstCall.args[0].statusCode, 202);
     });
 
   it('does not fail request if `statusCode` is in `expect` array', () => {
-    const spy = sinon.spy();
-    request({ expect: [200, 304] }, null, spy);
+    const fake = sinon.fake();
+    request({ expect: [200, 304] }, null, fake);
 
     res.statusCode = 304;
-    https.request.yield(res);
+    https.request.callback(res);
     res.on.withArgs('end').yield();
 
-    assert.calledOnceWith(spy, null, null, res);
+    assert.calledOnceWith(fake, null, null, res);
   });
 
   it('fails request if response is not valid JSON', () => {
-    const spy = sinon.spy();
-    request({}, null, spy);
+    const fake = sinon.fake();
+    request({}, null, fake);
 
     res.statusCode = 200;
-    https.request.yield(res);
+    https.request.callback(res);
     res.on.withArgs('data').yield('<html/>');
     res.on.withArgs('end').yield();
 
-    assert.calledOnceWith(spy, match({
+    assert.calledOnceWith(fake, match({
       name: 'SyntaxError',
       message: sinon.match('Unexpected token'),
       code: 'E_JSON'
@@ -287,18 +287,18 @@ describe('request', () => {
   });
 
   it('sets a timeout, but does not pass the option on', () => {
-    const spy = sinon.spy();
+    const fake = sinon.fake();
 
     request({
       hostname: 'that-host.com',
       timeout: 5000
-    }, spy);
+    }, fake);
 
     assert.calledOnceWith(https.request, {
       hostname: 'that-host.com'
     });
     clock.tick(5000);
-    assert.calledOnceWith(spy, match({
+    assert.calledOnceWith(fake, match({
       message: 'Request timeout',
       code: 'E_TIMEOUT'
     }));
@@ -331,28 +331,28 @@ describe('request', () => {
   });
 
   it('does not set a timeout if not configured', () => {
-    const spy = sinon.spy();
+    const fake = sinon.fake();
 
     request({
       hostname: 'that-host.com'
-    }, spy);
+    }, fake);
 
     clock.tick(5000);
-    refute.called(spy);
+    refute.called(fake);
   });
 
   it('clears the timeout on error', () => {
-    const spy = sinon.spy();
+    const fake = sinon.fake();
     const error = new Error('ouch!');
 
     request({
       hostname: 'that-host.com',
       timeout: 5000
-    }, spy);
+    }, fake);
 
     req.emit('error', error);
     clock.tick(5000);
-    assert.calledOnceWithMatch(spy, {
+    assert.calledOnceWithMatch(fake, {
       message: 'Request failure',
       code: 'E_ERROR',
       cause: error
@@ -360,120 +360,120 @@ describe('request', () => {
   });
 
   it('clears the timeout on response', () => {
-    const spy = sinon.spy();
+    const fake = sinon.fake();
     request({
       hostname: 'that-host.com',
       timeout: 5000
-    }, spy);
+    }, fake);
 
-    https.request.yield(res);
+    https.request.callback(res);
     res.on.withArgs('data').yield(JSON.stringify({ some: 'payload' }));
     res.on.withArgs('end').yield();
 
     clock.tick(5000);
-    assert.calledOnceWith(spy, null, { some: 'payload' }, res);
+    assert.calledOnceWith(fake, null, { some: 'payload' }, res);
   });
 
   it('does not fail if the response processing takes longer', () => {
-    const spy = sinon.spy();
+    const fake = sinon.fake();
     request({
       hostname: 'that-host.com',
       timeout: 5000
-    }, spy);
+    }, fake);
 
-    https.request.yield(res);
+    https.request.callback(res);
     res.on.withArgs('data').yield(JSON.stringify({ some: 'payload' }));
     clock.tick(5000);
     res.on.withArgs('end').yield();
 
-    assert.calledOnceWith(spy, null, { some: 'payload' }, res);
+    assert.calledOnceWith(fake, null, { some: 'payload' }, res);
   });
 
   it('does not invoke the callback twice on timeout after unexpected response',
     () => {
-      const spy = sinon.spy();
+      const fake = sinon.fake();
       request({
         hostname: 'that-host.com',
         timeout: 5000,
         expect: 200
-      }, spy);
+      }, fake);
 
       res.statusCode = 300;
-      https.request.yield(res);
+      https.request.callback(res);
       res.on.withArgs('end').yield();
       clock.tick(5000);
 
-      assert.calledOnceWith(spy, sinon.match.instanceOf(Error));
+      assert.calledOnceWith(fake, sinon.match.instanceOf(Error));
     });
 
   it('does not fail if response is empty and not application/json', () => {
-    const spy = sinon.spy();
+    const fake = sinon.fake();
     request({
       hostname: 'that-host.com'
-    }, spy);
+    }, fake);
     delete res.headers['content-type'];
 
-    https.request.yield(res);
+    https.request.callback(res);
     res.on.withArgs('end').yield();
 
-    assert.calledOnceWith(spy, null, null, res);
+    assert.calledOnceWith(fake, null, null, res);
   });
 
   it('parses body if Content-Type is application/json; charset=utf-8', () => {
-    const spy = sinon.spy();
+    const fake = sinon.fake();
     request({
       hostname: 'that-host.com'
-    }, spy);
+    }, fake);
     res.headers['content-type'] = 'application/json; charset=utf-8';
 
-    https.request.yield(res);
+    https.request.callback(res);
     res.on.withArgs('data').yield(JSON.stringify({ some: 'payload' }));
     res.on.withArgs('end').yield();
 
-    assert.calledOnceWith(spy, null, { some: 'payload' }, res);
+    assert.calledOnceWith(fake, null, { some: 'payload' }, res);
   });
 
   it('does not throw if content-type is not provided', () => {
-    const spy = sinon.spy();
+    const fake = sinon.fake();
     request({
       hostname: 'that-host.com'
-    }, spy);
+    }, fake);
     delete res.headers['content-type'];
 
-    https.request.yield(res);
+    https.request.callback(res);
     res.on.withArgs('data').yield(JSON.stringify({ some: 'payload' }));
     res.on.withArgs('end').yield();
 
-    assert.calledOnceWith(spy, null, null, res);
+    assert.calledOnceWith(fake, null, null, res);
   });
 
   it('returns the response instead of parsing it if `stream: true`', () => {
-    const spy = sinon.spy();
+    const fake = sinon.fake();
     request({
       hostname: 'that-host.com',
       stream: true
-    }, spy);
+    }, fake);
 
-    https.request.yield(res);
+    https.request.callback(res);
 
-    assert.calledOnceWith(spy, null, res);
+    assert.calledOnceWith(fake, null, res);
     // Assert no data listeners are installed:
     refute.calledWith(res.on, 'data');
   });
 
   it('performs `expect` check if `stream: true`', () => {
-    const spy = sinon.spy();
+    const fake = sinon.fake();
     request({
       hostname: 'that-host.com',
       stream: true,
       expect: 200
-    }, spy);
+    }, fake);
 
     res.statusCode = 300;
-    https.request.yield(res);
+    https.request.callback(res);
     res.on.withArgs('end').yield();
 
-    assert.calledOnceWith(spy, sinon.match.instanceOf(Error));
+    assert.calledOnceWith(fake, sinon.match.instanceOf(Error));
   });
 
   it('follows redirect if `stream: true`', () => {
@@ -486,7 +486,7 @@ describe('request', () => {
     res.statusCode = 302;
     delete res.headers['content-type'];
     res.headers.location = 'https://other-host.com/some/path';
-    https.request.yield(res);
+    https.request.callback(res);
 
     assert.calledTwice(https.request);
     assert.calledWithMatch(https.request, {
@@ -496,11 +496,11 @@ describe('request', () => {
   });
 
   it('follows redirect if no stream', () => {
-    const spy = sinon.spy();
+    const fake = sinon.fake();
     request({
       hostname: 'that-host.com',
       expect: [200, 302]
-    }, spy);
+    }, fake);
 
     res.statusCode = 302;
     delete res.headers['content-type'];
@@ -517,7 +517,7 @@ describe('request', () => {
       hostname: 'other-host.com',
       path: '/some/path'
     });
-    assert.calledOnceWith(spy, null, { some: 'payload' });
+    assert.calledOnceWith(fake, null, { some: 'payload' });
   });
 
   it('retains host and port if redirect location is only a path', () => {
@@ -531,7 +531,7 @@ describe('request', () => {
     res.statusCode = 302;
     delete res.headers['content-type'];
     res.headers.location = '/some/path';
-    https.request.yield(res);
+    https.request.callback(res);
 
     assert.calledTwice(https.request);
     assert.calledWithMatch(https.request.secondCall, {
@@ -542,12 +542,12 @@ describe('request', () => {
   });
 
   it('does not follow another redirect', () => {
-    const spy = sinon.spy();
+    const fake = sinon.fake();
     request({
       hostname: 'that-host.com',
       expect: [200, 302],
       stream: true
-    }, spy);
+    }, fake);
 
     res.statusCode = 302;
     delete res.headers['content-type'];
@@ -556,19 +556,19 @@ describe('request', () => {
     https.request.firstCall.yield(res);
     https.request.secondCall.yield(res);
 
-    assert.calledOnceWithMatch(spy, {
+    assert.calledOnceWithMatch(fake, {
       message: 'Expected response statusCode to be 200, but was 302',
       code: 'E_EXPECT'
     });
   });
 
   it('retains expect array when following redirects', () => {
-    const spy = sinon.spy();
+    const fake = sinon.fake();
     request({
       hostname: 'that-host.com',
       expect: [200, 201, 302],
       stream: true
-    }, spy);
+    }, fake);
 
     res.statusCode = 302;
     delete res.headers['content-type'];
@@ -577,7 +577,7 @@ describe('request', () => {
     https.request.firstCall.yield(res);
     https.request.secondCall.yield(res);
 
-    assert.calledOnceWithMatch(spy, {
+    assert.calledOnceWithMatch(fake, {
       message:
         'Expected response statusCode to be one of [200, 201], but was 302',
       code: 'E_EXPECT'
@@ -586,12 +586,12 @@ describe('request', () => {
 
   function assertLogBody(content_type, body) {
     const log = logger('Request');
-    sinon.stub(log, 'warn');
+    sinon.replace(log, 'warn', sinon.fake());
 
-    const spy = sinon.spy();
+    const fake = sinon.fake();
     request({
       hostname: 'that-host.com'
-    }, spy);
+    }, fake);
 
     res.statusCode = 403;
     res.headers['content-type'] = content_type;
@@ -612,7 +612,7 @@ describe('request', () => {
         body
       }
     });
-    assert.calledOnce(spy);
+    assert.calledOnce(fake);
   }
 
   it('logs body if content type is text/plain', () => {
@@ -625,12 +625,12 @@ describe('request', () => {
 
   it('logs JSON request headers on request error event', () => {
     const log = logger('Request');
-    sinon.stub(log, 'error');
-    const spy = sinon.spy();
+    sinon.replace(log, 'error', sinon.fake());
+    const fake = sinon.fake();
     request({
       hostname: 'that-host.com',
       headers: { some: 'header' }
-    }, spy);
+    }, fake);
     clock.tick(17);
     const error = new Error('ECONREFUSED');
 
@@ -646,16 +646,16 @@ describe('request', () => {
         headers: { some: 'header' }
       }
     }, error);
-    assert.calledOnce(spy);
+    assert.calledOnce(fake);
   });
 
   it('logs JSON request body on request error event', () => {
     const log = logger('Request');
-    sinon.stub(log, 'error');
-    const spy = sinon.spy();
+    sinon.replace(log, 'error', sinon.fake());
+    const fake = sinon.fake();
     request({
       hostname: 'that-host.com',
-    }, { is: 42 }, spy);
+    }, { is: 42 }, fake);
     clock.tick(17);
     const error = new Error('ECONREFUSED');
 
@@ -668,16 +668,16 @@ describe('request', () => {
         body: JSON.stringify({ is: 42 })
       })
     }, error);
-    assert.calledOnce(spy);
+    assert.calledOnce(fake);
   });
 
   it('does not log stream request body on request error event', () => {
     const log = logger('Request');
-    sinon.stub(log, 'error');
-    const spy = sinon.spy();
+    sinon.replace(log, 'error', sinon.fake());
+    const fake = sinon.fake();
     request({
       hostname: 'that-host.com',
-    }, new stream.PassThrough(), spy);
+    }, new stream.PassThrough(), fake);
     clock.tick(17);
     const error = new Error('ECONREFUSED');
 
@@ -693,13 +693,13 @@ describe('request', () => {
         headers: undefined
       }
     }, error);
-    assert.calledOnce(spy);
+    assert.calledOnce(fake);
   });
 
   it('uses a child logger of the given logger', () => {
     const log = logger('custom');
     const child_log = log.child('Request');
-    sinon.stub(child_log, 'error');
+    sinon.replace(child_log, 'error', sinon.fake());
     request({
       log,
       hostname: 'that-host.com'
