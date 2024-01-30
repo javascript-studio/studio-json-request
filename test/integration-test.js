@@ -17,7 +17,7 @@ describe('integration', () => {
     server = http.createServer((_req, _res) => {});
     server.listen(() => {
 
-      const on_abort = sinon.spy();
+      const on_abort = sinon.fake();
       const req = request({
         protocol: 'http:',
         port: server.address().port,
