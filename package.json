@@ -31,12 +31,12 @@
     "@studio/log": "^2.0.0"
   },
   "devDependencies": {
+    "@sinonjs/referee-sinon": "^12.0.0",
     "@studio/changes": "^2.2.0",
     "@studio/eslint-config": "^1.1.1",
     "@studio/log-x": "^1.1.0",
     "eslint": "^7.27.0",
-    "mocha": "^10.2.0",
-    "sinon": "^11.1.0"
+    "mocha": "^10.2.0"
   },
   "repository": {
     "type": "git",

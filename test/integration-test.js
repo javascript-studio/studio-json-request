@@ -1,8 +1,7 @@
 /*eslint-env mocha*/
 'use strict';
 
-const assert = require('assert');
-const sinon = require('sinon');
+const { assert, refute, sinon } = require('@sinonjs/referee-sinon');
 const http = require('http');
 const request = require('..');
 
@@ -24,10 +23,10 @@ describe('integration', () => {
         port: server.address().port,
         timeout: 10
       }, (err) => {
-        assert.notEqual(err, null);
-        assert.equal(err.message, 'Request timeout');
+        refute.isNull(err);
+        assert.equals(err.message, 'Request timeout');
         setTimeout(() => {
-          sinon.assert.calledOnce(on_abort);
+          assert.calledOnce(on_abort);
           done();
         }, 10);
       });
@@ -58,9 +57,9 @@ describe('integration', () => {
         path: '/',
         expect: [200, 302]
       }, (err, json, res) => {
-        assert.ifError(err);
-        assert.equal(res.statusCode, 200);
-        assert.deepEqual(json, { hello: 'redirect' });
+        assert.isNull(err);
+        assert.equals(res.statusCode, 200);
+        assert.equals(json, { hello: 'redirect' });
         done();
       });
 
