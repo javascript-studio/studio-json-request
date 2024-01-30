@@ -29,7 +29,7 @@ describe('request', () => {
   beforeEach(() => {
     req = new EventEmitter();
     req.end = sinon.fake();
-    req.abort = sinon.fake();
+    req.destroy = sinon.fake();
     res = fakeResponse();
     sinon.replace(http, 'request', sinon.fake.returns(req));
     sinon.replace(https, 'request', sinon.fake.returns(req));
@@ -302,7 +302,7 @@ describe('request', () => {
       message: 'Request timeout',
       code: 'E_TIMEOUT'
     }));
-    assert.calledOnce(req.abort);
+    assert.calledOnce(req.destroy);
   });
 
   it('does not modify the original options', () => {
